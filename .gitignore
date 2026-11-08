@@ -1,0 +1,4 @@
+config.json
+knowledge-base/
+__pycache__/
+*.pyc

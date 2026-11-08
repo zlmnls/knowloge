@@ -1,0 +1,2486 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>知脉 · Work Memory 个人工作记忆与知识图谱</title>
+<style>
+/* Youpu-inspired Editorial Notebook & Pine Green Design System */
+:root {
+  --bg-sidebar: #eeede3;
+  --bg-page: #fafaf2;
+  --bg-card: #fffffa;
+  --bg-subtle: #f3f4ea;
+  --bg-hover: #e7edde;
+  --ink: #253f34;
+  --ink-secondary: #4e5e52;
+  --muted: #798272;
+  --line: #daddd0;
+  --line-strong: #c5cbb8;
+  --green: #285848;
+  --green-hover: #1e4638;
+  --green-soft: #e4ecdc;
+  --citrus: #eceb9f;
+  --citrus-ink: #475628;
+  --amber: #a46640;
+  --amber-soft: #fbf3ea;
+  --amber-line: #ebd5be;
+  --danger: #b24b3e;
+  --danger-soft: #fdf0ed;
+  --cat-biz: #285848;
+  --cat-biz-soft: #e3ece4;
+  --cat-sys: #3b5978;
+  --cat-sys-soft: #e5edf5;
+  --cat-proj: #6b6032;
+  --cat-proj-soft: #f1eed8;
+  --cat-person: #9c5a3c;
+  --cat-person-soft: #f7ebe4;
+  --radius: 12px;
+  --radius-sm: 8px;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  color: var(--ink);
+  background: var(--bg-page);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg-page); color: var(--ink); overflow: hidden; height: 100vh; }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { cursor: pointer; border: 0; background: none; transition: all 0.15s ease; }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+h1, h2, h3, h4, p { margin: 0; }
+svg { vertical-align: middle; flex-shrink: 0; stroke-width: 1.75; }
+
+/* App Shell Layout */
+.desktop-shell { display: flex; height: 100vh; width: 100vw; overflow: hidden; background: var(--bg-page); }
+
+/* Left Navigation Sidebar */
+.sidebar {
+  width: 228px; flex-shrink: 0; height: 100vh; background: var(--bg-sidebar);
+  border-right: 1px solid var(--line); display: flex; flex-direction: column;
+  padding: 20px 13px 14px; user-select: none;
+}
+.brand {
+  display: flex; align-items: center; gap: 10px; padding: 2px 8px 18px;
+  color: var(--ink); text-align: left;
+}
+.brand-mark {
+  width: 32px; height: 32px; border-radius: 9px; background: var(--green);
+  color: #f4f7ec; display: flex; align-items: center; justify-content: center;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15);
+}
+.brand-text strong { font-size: 18px; letter-spacing: 1.5px; display: block; line-height: 1.1; }
+.brand-text small { font-size: 11px; color: var(--muted); display: block; margin-top: 3px; }
+
+.search-trigger {
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+  border: 1px solid #d5dac8; border-radius: 8px; background: #f7f7ee;
+  color: var(--muted); font-size: 12px; margin-bottom: 16px; width: 100%;
+}
+.search-trigger:hover { border-color: #bcc4ae; color: var(--ink); background: var(--bg-card); }
+.search-trigger span { flex: 1; text-align: left; }
+.search-trigger kbd {
+  font-size: 10px; color: #8c9480; background: #ebede2;
+  padding: 2px 5px; border-radius: 4px; border: 1px solid #d8ddd0;
+}
+
+.nav-group { display: flex; flex-direction: column; gap: 3px; }
+.nav-btn {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 9px 11px; border-radius: 8px; color: #5b6956;
+  font-size: 13px; font-weight: 500; text-align: left; min-height: 38px;
+}
+.nav-btn:hover { background: #e3e7d8; color: var(--ink); }
+.nav-btn.active { background: #dbe4cc; color: var(--green); font-weight: 650; }
+.nav-btn span { flex: 1; }
+.nav-badge {
+  font-size: 11px; min-width: 22px; padding: 1px 6px; line-height: 18px;
+  text-align: center; border-radius: 6px; background: #f3f4dc; color: #526837; font-weight: 600;
+}
+
+.sidebar-section-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin: 22px 10px 8px; color: #848c78; font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
+}
+.sidebar-section-head button {
+  color: #67775a; padding: 3px 6px; border-radius: 5px; font-size: 11px;
+  display: inline-flex; align-items: center; gap: 3px;
+}
+.sidebar-section-head button:hover { background: #e2e7d7; color: var(--green); }
+
+.sidebar-entities { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; padding-right: 2px; }
+.sidebar-entity-item {
+  display: flex; align-items: center; gap: 9px; padding: 7px 11px;
+  width: 100%; border-radius: 7px; color: #64735c; font-size: 12.5px; text-align: left;
+}
+.sidebar-entity-item:hover { background: #e3e8d7; color: var(--ink); }
+.sidebar-entity-item i { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
+.sidebar-entity-item span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sidebar-entity-item small { font-size: 10px; color: #8f9883; }
+
+.sidebar-footer {
+  border-top: 1px solid var(--line); padding-top: 10px; margin-top: 10px;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.status-line {
+  display: flex; align-items: center; gap: 7px; padding: 8px 10px 0;
+  color: #87907c; font-size: 11px;
+}
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: #749862; }
+
+/* Main Content Area */
+.main-shell { flex: 1; display: flex; flex-direction: column; min-width: 0; height: 100vh; overflow: hidden; }
+.topbar {
+  height: 48px; flex-shrink: 0; padding: 0 28px; background: var(--bg-page);
+  border-bottom: 1px solid #e5e6da; display: flex; align-items: center; justify-content: space-between;
+}
+.topbar-title { font-size: 12.5px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.topbar-title strong { color: var(--ink); font-weight: 600; }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+
+.main-scroll { flex: 1; overflow-y: auto; padding: 26px 32px 60px; scrollbar-gutter: stable; }
+.container { max-width: 1220px; margin: 0 auto; }
+
+/* Page Heading */
+.page-head {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  gap: 16px; margin-bottom: 22px; flex-wrap: wrap;
+}
+.page-head h1 { font-size: 23px; font-weight: 650; letter-spacing: -0.5px; color: var(--ink); }
+.page-head p { font-size: 13px; color: var(--muted); margin-top: 5px; line-height: 1.5; }
+.head-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  border: 1px solid var(--line); background: var(--bg-card); color: var(--ink-secondary);
+  border-radius: var(--radius-sm); padding: 8px 13px; font-size: 12.5px; font-weight: 550;
+  white-space: nowrap;
+}
+.btn:hover:not(:disabled) { background: var(--bg-hover); border-color: #bdc8b6; color: var(--ink); }
+.btn.primary { background: var(--green); border-color: var(--green); color: #fffffa; }
+.btn.primary:hover:not(:disabled) { background: var(--green-hover); border-color: var(--green-hover); }
+.btn.citrus { background: var(--citrus); border-color: #dddf9b; color: var(--citrus-ink); }
+.btn.citrus:hover:not(:disabled) { background: #e3e28e; }
+.btn.danger { background: var(--danger-soft); border-color: #f3cdc6; color: var(--danger); }
+.btn.danger:hover:not(:disabled) { background: #fae1dc; }
+.btn.sm { padding: 5px 10px; font-size: 12px; border-radius: 6px; }
+.btn.xs { padding: 3px 8px; font-size: 11px; border-radius: 5px; }
+
+/* Badges & Category Pills */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px;
+  border-radius: 6px; font-size: 11px; font-weight: 600; line-height: 1.5; white-space: nowrap;
+}
+.badge.BusinessEntity { background: var(--cat-biz-soft); color: var(--cat-biz); }
+.badge.SystemEntity { background: var(--cat-sys-soft); color: var(--cat-sys); }
+.badge.Project { background: var(--cat-proj-soft); color: var(--cat-proj); }
+.badge.Person { background: var(--cat-person-soft); color: var(--cat-person); }
+.badge.match { background: #e2eedc; color: #2b5b3c; }
+.badge.create { background: var(--citrus); color: var(--citrus-ink); }
+.badge.confirmed { background: #e2eedc; color: #2b5b3c; }
+.badge.discussing { background: var(--amber-soft); color: var(--amber); border: 1px solid var(--amber-line); }
+.badge.proposed { background: #e8eef5; color: #3b5978; }
+.badge.historical { background: #ecefe8; color: #879080; text-decoration: line-through; }
+
+/* Composer Card (Tab 1) */
+.composer-card {
+  background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius);
+  box-shadow: 0 4px 16px rgba(37, 63, 52, 0.03); overflow: hidden; margin-bottom: 22px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.composer-card:focus-within { border-color: #93ab96; box-shadow: 0 0 0 3px rgba(40, 88, 72, 0.08); }
+.composer-head {
+  padding: 12px 18px; background: var(--bg-subtle); border-bottom: 1px solid #e6e8dc;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.composer-context-info { font-size: 12px; color: var(--ink-secondary); display: flex; align-items: center; gap: 8px; }
+.speaker-strip {
+  padding: 10px 18px; background: #f6f7ee; border-bottom: 1px dashed var(--line);
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12px;
+}
+.speaker-chip {
+  display: inline-flex; align-items: center; gap: 6px; background: var(--bg-card);
+  border: 1px solid var(--line); border-radius: 6px; padding: 3px 8px;
+}
+.speaker-chip input {
+  border: 0; border-bottom: 1px solid transparent; background: transparent;
+  width: 110px; padding: 2px 4px; font-size: 12px; color: var(--green); font-weight: 600;
+}
+.speaker-chip input:focus { outline: none; border-bottom-color: var(--green); }
+
+.composer-body { padding: 16px 18px 10px; }
+.composer-body textarea {
+  width: 100%; border: 0; outline: none; background: transparent; resize: vertical;
+  min-height: 150px; font-size: 14px; line-height: 1.75; color: var(--ink);
+}
+.composer-body textarea::placeholder { color: #96a08d; }
+.composer-foot {
+  padding: 10px 18px 14px; display: flex; justify-content: space-between; align-items: center;
+  gap: 12px; border-top: 1px solid #f0f2e8; flex-wrap: wrap;
+}
+.sample-links { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+.sample-links button { color: var(--green); text-decoration: underline; text-underline-offset: 3px; font-size: 12px; padding: 2px 4px; }
+.sample-links button:hover { color: var(--green-hover); }
+
+/* Dashboard Two-Column Guide (when no draft active) */
+.home-grid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 20px; align-items: start; }
+.sheet-card {
+  background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 20px 22px;
+}
+.sheet-title {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 14px; padding-bottom: 11px; border-bottom: 1px solid #ebede2;
+}
+.sheet-title h2 { font-size: 14.5px; font-weight: 650; color: var(--ink); display: flex; align-items: center; gap: 7px; }
+.seed-quick-form { display: grid; grid-template-columns: 1.1fr 125px 1fr auto; gap: 7px; margin-bottom: 12px; }
+.input {
+  width: 100%; border: 1px solid var(--line); border-radius: 7px; padding: 7px 10px;
+  background: var(--bg-card); font-size: 13px; color: var(--ink);
+}
+.input:focus { outline: none; border-color: var(--green); box-shadow: 0 0 0 2px rgba(40, 88, 72, 0.1); }
+
+/* Review Workbench (Progressive Disclosure, Read-First) */
+.review-sheet {
+  background: var(--bg-card); border: 1px solid #c9d2c0; border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(37, 63, 52, 0.06); overflow: hidden; margin-top: 10px;
+}
+.review-banner {
+  background: #f1f4e8; padding: 18px 24px; border-bottom: 1px solid var(--line);
+}
+.review-banner-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.review-banner h2 { font-size: 17px; font-weight: 650; color: var(--ink); }
+.review-banner p { font-size: 13px; color: var(--ink-secondary); margin-top: 5px; line-height: 1.6; }
+.noise-bar {
+  margin-top: 11px; padding-top: 10px; border-top: 1px dashed #d2d8c5;
+  display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 12px; color: var(--muted);
+}
+
+.review-steps-nav {
+  display: flex; gap: 4px; padding: 10px 24px 0; background: #f7f8f0; border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+}
+.step-tab {
+  padding: 10px 16px; border-bottom: 2px solid transparent; color: var(--muted);
+  font-size: 13px; font-weight: 550; display: inline-flex; align-items: center; gap: 7px; white-space: nowrap;
+}
+.step-tab:hover { color: var(--ink); }
+.step-tab.active { color: var(--green); border-bottom-color: var(--green); font-weight: 650; background: var(--bg-card); border-radius: 8px 8px 0 0; }
+.step-tab b {
+  font-size: 11px; padding: 1px 6px; border-radius: 99px; background: #e6eadc; color: var(--ink-secondary);
+}
+.step-tab.active b { background: var(--green-soft); color: var(--green); }
+
+.review-body { padding: 22px 24px; }
+.entity-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; }
+.ent-card {
+  border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+  background: var(--bg-card); transition: border-color 0.15s, background 0.15s;
+}
+.ent-card:hover { border-color: #b8c4ae; }
+.ent-card.unapproved { opacity: 0.45; background: #f7f7f2; }
+.ent-card-head { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+.ent-title-group { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
+.ent-title-group strong { font-size: 15px; font-weight: 650; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ent-desc { font-size: 12.5px; color: var(--ink-secondary); margin: 8px 0; line-height: 1.5; }
+.ent-aliases { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; font-size: 11.5px; color: var(--muted); }
+.alias-tag { background: var(--bg-subtle); border: 1px solid #e2e6d8; padding: 1px 7px; border-radius: 5px; color: var(--ink-secondary); }
+.ent-edit-drawer {
+  margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line);
+  display: grid; gap: 8px; background: #fafbf6; padding: 10px; border-radius: 8px;
+}
+
+.rel-list, .fact-list { display: flex; flex-direction: column; gap: 8px; }
+.rel-item, .fact-item {
+  display: flex; align-items: center; gap: 12px; padding: 11px 14px;
+  border: 1px solid var(--line); border-radius: 9px; background: var(--bg-card);
+  flex-wrap: wrap;
+}
+.rel-item.unapproved, .fact-item.unapproved { opacity: 0.45; background: #f7f7f2; }
+.rel-flow { display: flex; align-items: center; gap: 10px; font-size: 13.5px; flex: 1; min-width: 260px; flex-wrap: wrap; }
+.rel-node { font-weight: 650; color: var(--ink); background: var(--bg-subtle); padding: 3px 9px; border-radius: 6px; border: 1px solid #e2e6d8; }
+.rel-arrow {
+  display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px;
+  color: var(--green); background: var(--green-soft); padding: 2px 8px; border-radius: 99px; font-weight: 600;
+}
+.conflict-alert {
+  width: 100%; margin-top: 6px; margin-left: 26px; padding: 7px 11px;
+  border-radius: 7px; background: var(--amber-soft); border: 1px solid var(--amber-line);
+  color: var(--amber); font-size: 12px; display: flex; align-items: center; gap: 8px;
+}
+
+.wiki-review-split { display: grid; grid-template-columns: 230px 1fr; gap: 16px; align-items: start; }
+.review-footer {
+  padding: 15px 24px; background: #f4f5ec; border-top: 1px solid var(--line);
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+
+/* Knowledge Graph View (Tab 2) */
+.graph-workspace {
+  position: relative; height: calc(100vh - 155px); min-height: 540px;
+  border: 1px solid var(--line); border-radius: var(--radius); background: #f7f8f1; overflow: hidden;
+}
+#graphCanvas { width: 100%; height: 100%; display: block; cursor: grab; }
+#graphCanvas:active { cursor: grabbing; }
+.graph-floating-bar {
+  position: absolute; top: 14px; left: 14px; right: 14px; pointer-events: none;
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap;
+}
+.graph-pill-group {
+  pointer-events: auto; background: rgba(255, 255, 250, 0.94); backdrop-filter: blur(6px);
+  border: 1px solid var(--line); border-radius: 10px; padding: 6px 8px;
+  display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(37,63,52,0.06); flex-wrap: wrap;
+}
+.filter-chip {
+  padding: 5px 10px; border-radius: 6px; font-size: 12px; color: var(--ink-secondary);
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.filter-chip:hover { background: var(--bg-subtle); }
+.filter-chip.active { background: var(--green); color: #fff; font-weight: 600; }
+.filter-chip i { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+
+.graph-drawer {
+  position: absolute; top: 64px; right: 14px; bottom: 14px; width: 380px; max-width: calc(100% - 28px);
+  background: rgba(255, 255, 250, 0.97); backdrop-filter: blur(8px);
+  border: 1px solid var(--line-strong); border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(37, 63, 52, 0.12); display: flex; flex-direction: column;
+  z-index: 10; overflow: hidden;
+}
+.drawer-head {
+  padding: 14px 18px; border-bottom: 1px solid var(--line);
+  display: flex; justify-content: space-between; align-items: center; background: var(--bg-subtle);
+}
+.drawer-body { padding: 16px 18px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+
+/* Living Wiki Reader & Facts Layout (Tab 3) */
+.wiki-layout { display: grid; grid-template-columns: 245px minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
+.wiki-directory {
+  background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 14px; max-height: calc(100vh - 160px); overflow-y: auto;
+}
+.wiki-dir-group { margin-bottom: 14px; }
+.wiki-dir-label { font-size: 11px; font-weight: 650; color: var(--muted); padding: 4px 8px; letter-spacing: 0.04em; }
+.wiki-dir-btn {
+  display: flex; align-items: center; justify-content: space-between; width: 100%;
+  padding: 8px 10px; border-radius: 7px; font-size: 13px; color: var(--ink-secondary); text-align: left;
+}
+.wiki-dir-btn:hover { background: var(--bg-subtle); color: var(--ink); }
+.wiki-dir-btn.active { background: var(--green-soft); color: var(--green); font-weight: 650; }
+
+/* Editorial Markdown Document Styling */
+.wiki-paper {
+  background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 28px 32px; min-height: 540px; box-shadow: 0 4px 18px rgba(37, 63, 52, 0.025);
+}
+.md-doc h1 { font-size: 22px; font-weight: 700; color: var(--ink); padding-bottom: 14px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+.md-doc h2 {
+  font-size: 14.5px; font-weight: 650; color: var(--green); margin: 22px 0 10px;
+  padding: 6px 11px; background: var(--bg-subtle); border-left: 3px solid var(--green); border-radius: 0 6px 6px 0;
+}
+.md-doc h3 { font-size: 13.5px; font-weight: 650; color: var(--ink-secondary); margin: 14px 0 6px; }
+.md-doc ul { margin: 6px 0 14px; padding-left: 20px; }
+.md-doc li { line-height: 1.75; margin-bottom: 6px; color: var(--ink); }
+.md-doc p { line-height: 1.75; margin-bottom: 10px; color: var(--ink); }
+.md-doc code { background: #eff1e6; padding: 2px 6px; border-radius: 4px; font-size: 12.5px; color: #315442; font-family: Consolas, monospace; }
+
+/* Facts Timeline Card */
+.timeline-card {
+  border-left: 2px solid var(--line); padding-left: 14px; margin-left: 6px;
+  position: relative; padding-bottom: 16px;
+}
+.timeline-card::before {
+  content: ""; position: absolute; left: -5px; top: 4px; width: 8px; height: 8px;
+  border-radius: 50%; background: var(--green); border: 2px solid var(--bg-page);
+}
+.timeline-card.discussing::before { background: var(--amber); }
+.timeline-card.historical::before { background: #a2aa9a; }
+
+/* Modals & Command Palette */
+.backdrop {
+  position: fixed; inset: 0; background: rgba(25, 42, 34, 0.42); backdrop-filter: blur(2px);
+  display: flex; align-items: center; justify-content: center; z-index: 90; padding: 20px;
+}
+.dialog-box {
+  background: var(--bg-card); border: 1px solid var(--line); border-radius: 16px;
+  width: 640px; max-width: 94vw; max-height: 84vh; display: flex; flex-direction: column;
+  box-shadow: 0 24px 60px rgba(20, 38, 30, 0.22); overflow: hidden;
+}
+.dialog-head {
+  padding: 16px 22px; border-bottom: 1px solid var(--line); background: var(--bg-subtle);
+  display: flex; justify-content: space-between; align-items: center; font-weight: 650;
+}
+.dialog-body { padding: 20px 22px; overflow-y: auto; flex: 1; line-height: 1.7; }
+
+/* Toast Notification (Youpu Style) */
+.toast-wrap {
+  position: fixed; bottom: 24px; left: calc(50% + 114px); transform: translateX(-50%);
+  z-index: 120; display: flex; flex-direction: column; gap: 8px; pointer-events: none;
+}
+.toast-msg {
+  pointer-events: auto; background: #264336; color: #ebf4e1; padding: 11px 18px;
+  border-radius: 10px; font-size: 13px; box-shadow: 0 10px 28px rgba(20, 42, 30, 0.25);
+  display: flex; align-items: center; gap: 10px; animation: slideUp 0.18s ease-out;
+}
+.toast-msg.error { background: #7a3e34; color: #ffece8; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.hidden { display: none !important; }
+@media (max-width: 1080px) {
+  .home-grid, .wiki-layout, .wiki-review-split { grid-template-columns: 1fr; }
+  .sidebar { width: 190px; }
+  .toast-wrap { left: 50%; }
+}
+</style>
+</head>
+<body>
+<div class="desktop-shell">
+  <!-- LEFT NAVIGATION SIDEBAR -->
+  <aside class="sidebar">
+    <button class="brand" onclick="switchView('write')">
+      <div class="brand-mark">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v18M3 12h18M5.6 5.6l12.8 12.8M18.4 5.6 5.6 18.4"/></svg>
+      </div>
+      <div class="brand-text">
+        <strong>知脉</strong>
+        <small>个人工作记忆库</small>
+      </div>
+    </button>
+
+    <button class="search-trigger" id="btnOpenSearch">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <span>搜索实体、Wiki、事实</span>
+      <kbd>Ctrl K</kbd>
+    </button>
+
+    <nav class="nav-group" aria-label="主导航">
+      <button class="nav-btn active" data-view="write" onclick="switchView('write')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+        <span>录音转写整理</span>
+      </button>
+      <button class="nav-btn" data-view="graph" onclick="switchView('graph')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="12" cy="18" r="3"/><path d="M8.7 7.4 10.8 15M15.3 7.4 13.2 15M9 6h6"/></svg>
+        <span>知识图谱网络</span>
+        <b class="nav-badge" id="navCountEntities">0</b>
+      </button>
+      <button class="nav-btn" data-view="wiki" onclick="switchView('wiki')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+        <span>实体 Wiki 档案</span>
+        <b class="nav-badge" id="navCountWikis">0</b>
+      </button>
+      <button class="nav-btn" data-view="facts" onclick="switchView('facts')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+        <span>时序事实与决策</span>
+        <b class="nav-badge" id="navCountFacts">0</b>
+      </button>
+    </nav>
+
+    <div class="sidebar-section-head">
+      <span>核心实体速览</span>
+      <button onclick="openSeedModal()" title="手动添加种子实体">+ 种子实体</button>
+    </div>
+    <div class="sidebar-entities" id="sidebarEntities"></div>
+
+    <div class="sidebar-footer">
+      <button class="nav-btn" data-view="settings" onclick="switchView('settings')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+        <span>冷启动锚点与设置</span>
+      </button>
+      <div class="status-line">
+        <i class="status-dot"></i>
+        <span>本地知识库已就绪</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN WORKSPACE -->
+  <div class="main-shell">
+    <header class="topbar">
+      <div class="topbar-title" id="topbarBreadcrumb">
+        <strong>录音转写整理</strong>
+        <span>·</span>
+        <span>从飞书转写提取实体关系与增量 Wiki</span>
+      </div>
+      <div class="topbar-right">
+        <button class="btn sm" onclick="openSeedModal()">+ 录入种子实体</button>
+        <button class="btn sm" onclick="openBlacklistModal()">禁抽黑名单 (<span id="topBlCount">0</span>)</button>
+      </div>
+    </header>
+
+    <main class="main-scroll">
+      <div class="container">
+
+        <!-- ============================================================== -->
+        <!-- VIEW 1: INGEST & REVIEW WORKBENCH                              -->
+        <!-- ============================================================== -->
+        <section id="view-write">
+          <div class="page-head">
+            <div>
+              <h1>飞书录音转写 → 个人工作记忆</h1>
+              <p>自动剥离茶水间闲聊，对齐已有业务/系统实体，沉淀关系图谱与一实体一档案的 Living Wiki。</p>
+            </div>
+          </div>
+
+          <div class="composer-card">
+            <div class="composer-head">
+              <div class="composer-context-info" id="anchorHintBar">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span>正在加载冷启动锚点上下文…</span>
+              </div>
+              <div class="sample-links">
+                <span>快速试跑：</span>
+                <button type="button" id="btnSample1">填入示例1（初次对齐会议）</button>
+                <span>·</span>
+                <button type="button" id="btnSample2">填入示例2（规则变更+测试增量Wiki）</button>
+              </div>
+            </div>
+
+            <!-- Auto-detected Feishu speakers -->
+            <div id="speakerBar" class="speaker-strip hidden">
+              <span style="color:var(--ink-secondary);font-weight:600">识别到飞书说话人（点击可改为真实姓名/角色）：</span>
+              <div id="speakerInputs" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+            </div>
+
+            <div class="composer-body">
+              <textarea id="sourceInput" placeholder="直接粘贴飞书语音转文字内容（支持带 说话人 1、说话人 2 及时间戳的原始对话）……"></textarea>
+            </div>
+
+            <div class="composer-foot">
+              <div style="font-size:12px;color:var(--muted)" id="extractStatusText">支持自动过滤无效寒暄，自动将口语简称/同音错字归一化到已有实体</div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <button class="btn sm" id="btnClearSource">清空</button>
+                <button class="btn primary" id="btnExtract">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z"/></svg>
+                  <span>AI 提炼图谱与 Wiki 预览</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ACTIVE REVIEW WORKBENCH (Only shown when draft exists) -->
+          <div id="reviewWorkbench" class="review-sheet hidden">
+            <div class="review-banner">
+              <div class="review-banner-top">
+                <div>
+                  <span class="badge create" style="margin-bottom:6px">待审核入库草稿</span>
+                  <h2 id="rvTitle">工作对话整理</h2>
+                  <p id="rvSummary"></p>
+                </div>
+                <div style="display:flex;gap:8px;flex-shrink:0">
+                  <button class="btn sm" id="btnRealign" title="修改实体名后重新同步关系和Wiki">同步对齐名称</button>
+                  <button class="btn sm" id="btnToggleRawJson">JSON 源码</button>
+                </div>
+              </div>
+              <div class="noise-bar" id="rvNoiseBar"></div>
+            </div>
+
+            <div class="review-steps-nav" id="rvStepTabs">
+              <button class="step-tab active" data-step="entities" onclick="switchReviewStep('entities')">
+                <span>1. 实体节点审核</span>
+                <b id="rvCountEnt">0</b>
+              </button>
+              <button class="step-tab" data-step="relations" onclick="switchReviewStep('relations')">
+                <span>2. 图谱关系连线</span>
+                <b id="rvCountRel">0</b>
+              </button>
+              <button class="step-tab" data-step="facts" onclick="switchReviewStep('facts')">
+                <span>3. 时序事实结论</span>
+                <b id="rvCountFact">0</b>
+              </button>
+              <button class="step-tab" data-step="wiki" onclick="switchReviewStep('wiki')">
+                <span>4. Living Wiki 增量预览</span>
+                <b id="rvCountWiki">0</b>
+              </button>
+            </div>
+
+            <div class="review-body" id="rvVisualBody">
+              <!-- Step 1: Entities -->
+              <div id="rvPane-entities">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                  <span style="font-size:12.5px;color:var(--muted)">阅读态优先：点击卡片上的「编辑」可改名或补别名，点击「合并」可并入已有实体，泛化词可一键「拉黑」。</span>
+                  <button class="btn sm" onclick="addDraftEntity()">+ 补充遗漏实体</button>
+                </div>
+                <div class="entity-grid" id="rvEntityGrid"></div>
+              </div>
+
+              <!-- Step 2: Relations -->
+              <div id="rvPane-relations" class="hidden">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                  <span style="font-size:12.5px;color:var(--muted)">实体间的上下游依赖、系统承载与归属关系（点击条目可修改）。</span>
+                  <button class="btn sm" onclick="addDraftRelation()">+ 新增关系连线</button>
+                </div>
+                <div class="rel-list" id="rvRelList"></div>
+              </div>
+
+              <!-- Step 3: Facts -->
+              <div id="rvPane-facts" class="hidden">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                  <span style="font-size:12.5px;color:var(--muted)">点击左侧状态胶囊可直接在「已确认 / 讨论中 / 提议」之间切换。</span>
+                  <button class="btn sm" onclick="addDraftFact()">+ 新增事实条目</button>
+                </div>
+                <div class="fact-list" id="rvFactList"></div>
+              </div>
+
+              <!-- Step 4: Living Wiki -->
+              <div id="rvPane-wiki" class="hidden">
+                <div class="wiki-review-split">
+                  <div id="rvWikiSidebar" style="display:flex;flex-direction:column;gap:6px"></div>
+                  <div id="rvWikiMain"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="review-body hidden" id="rvRawBody">
+              <textarea id="rvRawTextarea" class="input" style="min-height:380px;font-family:Consolas,monospace;font-size:12.5px"></textarea>
+            </div>
+
+            <div class="review-footer">
+              <div style="font-size:12.5px;color:var(--ink-secondary)" id="rvFooterSummary"></div>
+              <div style="display:flex;gap:10px;align-items:center">
+                <button class="btn danger" id="btnDiscardDraft">放弃草稿</button>
+                <button class="btn primary" id="btnCommitDraft">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span>确认无误，写入正式知识库</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- IDLE DASHBOARD GUIDE (Shown when no draft is being reviewed) -->
+          <div id="idleDashboard" class="home-grid">
+            <div class="sheet-card">
+              <div class="sheet-title">
+                <h2>快速建立种子实体（冷启动引力中心）</h2>
+                <span style="font-size:11.5px;color:var(--muted)">先录入几个常聊的系统或单据，AI 抽取更精准</span>
+              </div>
+              <div class="seed-quick-form">
+                <input type="text" class="input" id="quickSeedName" placeholder="实体名称（如：OMS订单系统）">
+                <select class="input" id="quickSeedCat">
+                  <option value="SystemEntity">系统实体</option>
+                  <option value="BusinessEntity">业务实体</option>
+                  <option value="Project">项目专项</option>
+                  <option value="Person">干系人/团队</option>
+                </select>
+                <input type="text" class="input" id="quickSeedAliases" placeholder="口语简称（如：老订单, 欧姆S）">
+                <button class="btn primary sm" id="btnQuickSeedAdd">添加</button>
+              </div>
+              <div id="homeEntityPills" style="display:flex;gap:6px;flex-wrap:wrap;padding-top:6px"></div>
+            </div>
+
+            <div class="sheet-card">
+              <div class="sheet-title">
+                <h2>最近导入的录音记录</h2>
+                <span style="font-size:11.5px;color:var(--muted)" id="homeSourceCount">0 条记录</span>
+              </div>
+              <div id="homeRecentSources" style="display:flex;flex-direction:column;gap:8px"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- VIEW 2: INTERACTIVE KNOWLEDGE GRAPH                            -->
+        <!-- ============================================================== -->
+        <section id="view-graph" class="hidden">
+          <div class="graph-workspace">
+            <canvas id="graphCanvas"></canvas>
+
+            <div class="graph-floating-bar">
+              <div class="graph-pill-group">
+                <button class="filter-chip active" data-cat="" onclick="setGraphCatFilter('')">全部 (<span id="gfAll">0</span>)</button>
+                <button class="filter-chip" data-cat="BusinessEntity" onclick="setGraphCatFilter('BusinessEntity')">
+                  <i style="background:var(--cat-biz)"></i>业务实体
+                </button>
+                <button class="filter-chip" data-cat="SystemEntity" onclick="setGraphCatFilter('SystemEntity')">
+                  <i style="background:var(--cat-sys)"></i>系统实体
+                </button>
+                <button class="filter-chip" data-cat="Project" onclick="setGraphCatFilter('Project')">
+                  <i style="background:var(--cat-proj)"></i>项目专项
+                </button>
+                <button class="filter-chip" data-cat="Person" onclick="setGraphCatFilter('Person')">
+                  <i style="background:var(--cat-person)"></i>干系人
+                </button>
+              </div>
+
+              <div class="graph-pill-group">
+                <input type="text" class="input" id="graphSearchInput" placeholder="过滤节点或别名…" style="width:170px;padding:5px 9px;font-size:12px">
+                <button class="btn sm" onclick="runForceLayout(80);drawGraph()">重新排布</button>
+                <button class="btn sm" onclick="resetGraphCamera()">居中视图</button>
+              </div>
+            </div>
+
+            <!-- Right Floating Inspector Drawer (Only visible when a node is clicked) -->
+            <div id="graphInspectorDrawer" class="graph-drawer hidden">
+              <div class="drawer-head">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span class="badge" id="gdCatBadge">业务实体</span>
+                  <strong id="gdTitle" style="font-size:15px">实体名称</strong>
+                </div>
+                <button class="btn xs" onclick="closeGraphDrawer()">关闭 ✕</button>
+              </div>
+              <div class="drawer-body" id="gdBody"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- VIEW 3: LIVING WIKI ARCHIVE                                    -->
+        <!-- ============================================================== -->
+        <section id="view-wiki" class="hidden">
+          <div class="page-head">
+            <div>
+              <h1>实体 Living Wiki 档案库</h1>
+              <p>每个核心实体对应唯一主文档，持续融合生效规则、上下游图谱边界、待定争议与演进历史。</p>
+            </div>
+            <div class="head-actions">
+              <input type="text" class="input" id="wikiFilterInput" placeholder="筛选实体名称或正文…" style="width:220px">
+            </div>
+          </div>
+
+          <div class="wiki-layout">
+            <div class="wiki-directory" id="wikiDirectory"></div>
+
+            <div class="wiki-paper">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+                <div id="wikiPaperMeta" style="display:flex;gap:8px;align-items:center"></div>
+                <div style="display:flex;gap:8px">
+                  <button class="btn sm hidden" id="btnJumpGraphFromWiki">在图谱中定位</button>
+                  <button class="btn sm hidden" id="btnToggleWikiEdit">编辑文档</button>
+                  <button class="btn primary sm hidden" id="btnSaveWikiDoc">保存修改</button>
+                </div>
+              </div>
+              <div id="wikiRenderedDoc" class="md-doc"></div>
+              <textarea id="wikiEditorArea" class="input hidden" style="min-height:480px;font-family:Consolas,monospace;line-height:1.7"></textarea>
+            </div>
+
+            <div class="sheet-card">
+              <div class="sheet-title">
+                <h2>关联关系与事实演化</h2>
+              </div>
+              <div id="wikiSideRelations" style="margin-bottom:18px"></div>
+              <h3 style="font-size:12.5px;color:var(--muted);margin-bottom:10px">时序事实轨迹（点击状态可切换）</h3>
+              <div id="wikiSideFacts"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- VIEW 4: TIME-SERIES FACTS & DECISIONS STREAM                   -->
+        <!-- ============================================================== -->
+        <section id="view-facts" class="hidden">
+          <div class="page-head">
+            <div>
+              <h1>时序事实与决策流 (Facts Stream)</h1>
+              <p>按时间回溯所有已确认规则、讨论中争议及已被替代的历史结论，每一条均可回溯至原始飞书录音。</p>
+            </div>
+            <div class="head-actions">
+              <select class="input" id="factsViewStatusFilter" style="width:150px" onchange="renderFactsStreamView()">
+                <option value="">全部状态</option>
+                <option value="confirmed">已确认 (confirmed)</option>
+                <option value="discussing">讨论中 (discussing)</option>
+                <option value="proposed">提议 (proposed)</option>
+                <option value="historical">历史归档 (historical)</option>
+              </select>
+              <input type="text" class="input" id="factsViewSearch" placeholder="搜索实体、属性或原话证据…" style="width:240px" oninput="renderFactsStreamView()">
+            </div>
+          </div>
+          <div class="sheet-card" id="factsStreamContainer"></div>
+        </section>
+
+        <!-- ============================================================== -->
+        <!-- VIEW 5: SEED PROFILE & LLM SETTINGS                            -->
+        <!-- ============================================================== -->
+        <section id="view-settings" class="hidden">
+          <div class="page-head">
+            <div>
+              <h1>冷启动锚点与模型设置</h1>
+              <p>配置你的个人角色背景与兼容 OpenAI 的模型服务商，所有数据均保存在本机目录。</p>
+            </div>
+          </div>
+
+          <div class="home-grid">
+            <div class="sheet-card">
+              <div class="sheet-title">
+                <h2>个人冷启动锚点卡 (Seed Profile)</h2>
+              </div>
+              <p style="font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:14px">
+                填写你的身份、职责与常聊的核心系统背景。每次抽取飞书录音时，系统会自动注入这段背景，让 AI 立即理解你们公司的内部术语。
+              </p>
+              <div style="display:grid;gap:12px">
+                <div>
+                  <label style="display:block;font-size:12px;font-weight:600;margin-bottom:5px">我的姓名 / 飞书默认标识</label>
+                  <input type="text" class="input" id="profName" placeholder="如：我 / 张工">
+                </div>
+                <div>
+                  <label style="display:block;font-size:12px;font-weight:600;margin-bottom:5px">我的岗位角色与职责范围</label>
+                  <input type="text" class="input" id="profRole" placeholder="如：交易与供应链产品经理，负责OMS订单、结算单与仓储对接">
+                </div>
+                <div>
+                  <label style="display:block;font-size:12px;font-weight:600;margin-bottom:5px">负责业务域、核心系统与行话简称说明</label>
+                  <textarea class="input" id="profContext" style="min-height:140px;line-height:1.65" placeholder="例如：&#10;1. 核心系统包括 OMS订单系统（常被同事简称为老订单、欧姆S）、WMS仓储系统、金蝶ERP。&#10;2. 核心业务单据有：结算单、采购单、退货单。&#10;3. 常用协作对象：王工（仓储研发）、李姐（财务结算组）。"></textarea>
+                </div>
+                <div style="display:flex;justify-content:flex-end;margin-top:4px">
+                  <button class="btn primary" id="btnSaveProfile">保存个人锚点卡</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="sheet-card">
+              <div class="sheet-title">
+                <h2>模型 API 接口设置</h2>
+              </div>
+              <p style="font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:14px">
+                支持 DeepSeek、通义千问、OpenAI 或本地 Ollama 等兼容 OpenAI Chat Completions 的服务。API Key 仅保存在本机 <code>config.json</code>。
+              </p>
+              <div style="display:grid;gap:12px">
+                <div>
+                  <label style="display:block;font-size:12px;font-weight:600;margin-bottom:5px">API Base URL</label>
+                  <input type="text" class="input" id="cfgBase" placeholder="https://api.openai.com/v1">
+                </div>
+                <div>
+                  <label style="display:block;font-size:12px;font-weight:600;margin-bottom:5px">模型名称 (Model)</label>
+                  <input type="text" class="input" id="cfgModel" placeholder="gpt-4o-mini / deepseek-chat / qwen-plus">
+                </div>
+                <div>
+                  <label style="display:block;font-size:12px;font-weight:600;margin-bottom:5px">API Key（留空则保留已保存密钥）</label>
+                  <input type="password" class="input" id="cfgKey" placeholder="sk-...">
+                </div>
+                <div>
+                  <label style="display:block;font-size:12px;font-weight:600;margin-bottom:5px">本地知识库存储目录</label>
+                  <input type="text" class="input" id="cfgKb" value="knowledge-base">
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+                  <button class="btn" id="btnTestLlm">测试模型连通性</button>
+                  <button class="btn primary" id="btnSaveCfg">保存模型设置</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- COMMAND PALETTE SEARCH MODAL (Ctrl + K) -->
+<div id="searchModal" class="backdrop hidden" onclick="if(event.target===this)closeSearchModal()">
+  <div class="dialog-box" style="width:580px">
+    <div style="padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="cmdSearchInput" placeholder="输入关键字搜索实体、口语别名、Living Wiki 或事实结论…" style="border:0;outline:none;width:100%;font-size:14.5px;background:transparent">
+      <kbd style="font-size:10px;color:var(--muted);border:1px solid var(--line);padding:2px 6px;border-radius:4px">ESC</kbd>
+    </div>
+    <div class="dialog-body" id="cmdSearchResults" style="padding:10px;max-height:420px"></div>
+  </div>
+</div>
+
+<!-- SEED ENTITY MODAL -->
+<div id="seedModal" class="backdrop hidden" onclick="if(event.target===this)$('seedModal').classList.add('hidden')">
+  <div class="dialog-box" style="width:480px">
+    <div class="dialog-head">
+      <span id="seedModalTitle">录入种子实体 / 编辑实体</span>
+      <button class="btn xs" onclick="$('seedModal').classList.add('hidden')">关闭</button>
+    </div>
+    <div class="dialog-body" style="display:grid;gap:12px">
+      <input type="hidden" id="modalEntId">
+      <div>
+        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px">标准实体名称 *</label>
+        <input type="text" class="input" id="modalEntName" placeholder="如：OMS订单系统 / 结算单 / 王工">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px">Ontology 顶层分类</label>
+          <select class="input" id="modalEntCat">
+            <option value="BusinessEntity">业务实体 (BusinessEntity)</option>
+            <option value="SystemEntity">系统实体 (SystemEntity)</option>
+            <option value="Project">项目专项 (Project)</option>
+            <option value="Person">干系人/团队 (Person)</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px">细分类型</label>
+          <input type="text" class="input" id="modalEntType" placeholder="如：核心单据 / 微服务">
+        </div>
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px">口语简称 / 飞书同音字别名（逗号分隔）</label>
+        <input type="text" class="input" id="modalEntAliases" placeholder="如：老订单, 欧姆S, 订单后台">
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;font-weight:600;margin-bottom:4px">一句话定义与职责边界</label>
+        <input type="text" class="input" id="modalEntDesc" placeholder="描述该实体的核心业务含义或系统边界">
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:6px">
+        <button class="btn" onclick="$('seedModal').classList.add('hidden')">取消</button>
+        <button class="btn primary" id="btnModalSaveEntity">保存实体</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BLACKLIST MODAL -->
+<div id="blacklistModal" class="backdrop hidden" onclick="if(event.target===this)$('blacklistModal').classList.add('hidden')">
+  <div class="dialog-box" style="width:520px">
+    <div class="dialog-head">
+      <span>禁抽泛化词黑名单管理</span>
+      <button class="btn xs" onclick="$('blacklistModal').classList.add('hidden')">关闭</button>
+    </div>
+    <div class="dialog-body">
+      <p style="font-size:12.5px;color:var(--muted);margin-bottom:12px">
+        以下泛化词汇（如“前端”、“接口”、“字段”、“方案A”）在录音抽取时会被强制过滤，绝不会污染你的知识图谱。
+      </p>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <input type="text" class="input" id="blModalInput" placeholder="输入要禁止抽为实体的泛词…">
+        <button class="btn primary sm" id="btnBlModalAdd">添加拉黑</button>
+      </div>
+      <div id="blModalTags" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SOURCE TRANSCRIPT MODAL -->
+<div id="sourceModal" class="backdrop hidden" onclick="if(event.target===this)$('sourceModal').classList.add('hidden')">
+  <div class="dialog-box">
+    <div class="dialog-head">
+      <span id="sourceModalTitle">原始飞书录音转写溯源</span>
+      <button class="btn xs" onclick="$('sourceModal').classList.add('hidden')">关闭</button>
+    </div>
+    <div class="dialog-body" id="sourceModalBody" style="white-space:pre-wrap;font-size:13px;background:#fafbf5"></div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+let KB = { entities: [], relations: [], facts: [], wikis: [], sources: [], blacklist: [], profile: {}, stats: {} };
+let currentView = "write";
+let currentDraft = null;
+let currentReviewStep = "entities";
+let editingDraftEntIdx = -1;
+let editingDraftRelIdx = -1;
+let editingDraftFactIdx = -1;
+let activeDraftWikiIdx = 0;
+let activeDraftWikiEditMode = false;
+let activeWikiEntityName = "";
+let graphCatFilter = "";
+let selectedGraphNodeId = "";
+
+const CAT_LABELS = {
+  BusinessEntity: "业务实体",
+  SystemEntity: "系统实体",
+  Project: "项目专项",
+  Person: "干系人",
+};
+const CAT_COLORS = {
+  BusinessEntity: "#285848",
+  SystemEntity: "#3b5978",
+  Project: "#7c6d32",
+  Person: "#9c5a3c",
+};
+const STATUS_LABELS = {
+  confirmed: "已确认",
+  discussing: "讨论中",
+  proposed: "提议/建议",
+  historical: "历史归档",
+  unknown: "待考证",
+};
+
+function toast(msg, isError = false) {
+  const wrap = $("toastWrap");
+  const el = document.createElement("div");
+  el.className = "toast-msg" + (isError ? " error" : "");
+  el.textContent = msg;
+  wrap.appendChild(el);
+  setTimeout(() => { el.remove(); }, 3400);
+}
+
+function esc(s) {
+  return String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+async function api(path, body) {
+  const r = await fetch(path, {
+    method: body ? "POST" : "GET",
+    headers: { "Content-Type": "application/json" },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const j = await r.json();
+  if (!r.ok || j.error) throw new Error(j.error || "请求失败");
+  return j;
+}
+
+// Simple Clean Markdown Renderer for Living Wiki
+function renderMarkdown(md) {
+  if (!md) return `<p style="color:var(--muted)">暂无内容</p>`;
+  const lines = String(md).split("\n");
+  let html = "";
+  let inList = false;
+  const formatInline = (str) => {
+    let s = esc(str);
+    s = s.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+    s = s.replace(/`([^`]+)`/g, "<code>$1</code>");
+    s = s.replace(/\[待定([^\]]*)\]/g, `<span class="badge discussing">待定$1</span>`);
+    return s;
+  };
+  for (let rawLine of lines) {
+    const line = rawLine.trimEnd();
+    if (line.startsWith("# ")) {
+      if (inList) { html += "</ul>"; inList = false; }
+      html += `<h1>${formatInline(line.slice(2))}</h1>`;
+    } else if (line.startsWith("## ")) {
+      if (inList) { html += "</ul>"; inList = false; }
+      html += `<h2>${formatInline(line.slice(3))}</h2>`;
+    } else if (line.startsWith("### ")) {
+      if (inList) { html += "</ul>"; inList = false; }
+      html += `<h3>${formatInline(line.slice(4))}</h3>`;
+    } else if (line.startsWith("- ") || line.startsWith("* ")) {
+      if (!inList) { html += "<ul>"; inList = true; }
+      html += `<li>${formatInline(line.slice(2))}</li>`;
+    } else if (!line.trim()) {
+      if (inList) { html += "</ul>"; inList = false; }
+    } else {
+      if (inList) { html += "</ul>"; inList = false; }
+      html += `<p>${formatInline(line)}</p>`;
+    }
+  }
+  if (inList) html += "</ul>";
+  return html;
+}
+
+// View Navigation
+const VIEW_TITLES = {
+  write: ["录音转写整理", "从飞书转写提取实体关系与增量 Wiki"],
+  graph: ["知识图谱网络", "可视化探索实体节点、别名与上下游关系边"],
+  wiki: ["实体 Wiki 档案", "一实体一主文档，持续沉淀最新业务规则与决策历史"],
+  facts: ["时序事实与决策", "按时间与确认状态管理所有业务断言与录音原话证据"],
+  settings: ["冷启动锚点与设置", "管理个人角色背景锚点与大模型 API 密钥"],
+};
+
+window.switchView = (view) => {
+  currentView = view;
+  document.querySelectorAll(".nav-btn[data-view]").forEach(b => {
+    b.classList.toggle("active", b.dataset.view === view);
+  });
+  ["write", "graph", "wiki", "facts", "settings"].forEach(v => {
+    $("view-" + v).classList.toggle("hidden", v !== view);
+  });
+  const [t1, t2] = VIEW_TITLES[view] || ["知脉", ""];
+  $("topbarBreadcrumb").innerHTML = `<strong>${esc(t1)}</strong><span>·</span><span>${esc(t2)}</span>`;
+
+  if (view === "graph") {
+    setTimeout(() => { resizeCanvas(); drawGraph(); }, 20);
+  } else if (view === "wiki") {
+    renderWikiView();
+  } else if (view === "facts") {
+    renderFactsStreamView();
+  }
+};
+
+// Load Full Knowledge Base Snapshot
+async function refreshKB() {
+  try {
+    KB = await api("/api/kb");
+    $("navCountEntities").textContent = KB.stats.entities_count || 0;
+    $("navCountWikis").textContent = KB.stats.wikis_count || 0;
+    $("navCountFacts").textContent = KB.stats.facts_count || 0;
+    $("topBlCount").textContent = (KB.blacklist || []).length;
+    $("gfAll").textContent = KB.stats.entities_count || 0;
+
+    // Anchor bar in composer
+    const roleStr = KB.profile?.my_role ? `角色「${KB.profile.my_role}」` : "未设置个人角色锚点";
+    $("anchorHintBar").innerHTML = `
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span>当前上下文基准：<b>${esc(KB.profile?.my_name || "我")}</b>（${esc(roleStr)}） · 已加载 <b>${KB.stats.entities_count || 0}</b> 个正式实体与别名表参与同名归一</span>
+    `;
+
+    // Populate Settings Profile
+    if (KB.profile) {
+      $("profName").value = KB.profile.my_name || "我";
+      $("profRole").value = KB.profile.my_role || "";
+      $("profContext").value = KB.profile.domain_context || "";
+    }
+
+    renderSidebarEntities();
+    renderIdleDashboard();
+    syncGraphNodes();
+    if (currentView === "wiki") renderWikiView();
+    if (currentView === "facts") renderFactsStreamView();
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function renderSidebarEntities() {
+  const ents = KB.entities || [];
+  if (!ents.length) {
+    $("sidebarEntities").innerHTML = `<div style="padding:10px 11px;font-size:11.5px;color:var(--muted)">暂无实体，可点击上方「+ 种子实体」或导入录音生成</div>`;
+    return;
+  }
+  $("sidebarEntities").innerHTML = ents.slice(0, 25).map(e => `
+    <button class="sidebar-entity-item" onclick="jumpToEntityWiki('${esc(e.name)}')">
+      <i style="background:${CAT_COLORS[e.category] || '#285848'}"></i>
+      <span>${esc(e.name)}</span>
+      <small>${esc(CAT_LABELS[e.category]?.slice(0, 2) || "实体")}</small>
+    </button>
+  `).join("");
+}
+
+window.jumpToEntityWiki = (ename) => {
+  activeWikiEntityName = ename;
+  switchView("wiki");
+};
+
+function renderIdleDashboard() {
+  const ents = KB.entities || [];
+  $("homeEntityPills").innerHTML = ents.length
+    ? ents.map(e => `
+      <button class="badge ${esc(e.category)}" style="cursor:pointer;padding:4px 10px" onclick="jumpToEntityWiki('${esc(e.name)}')">
+        <span>${esc(e.name)}</span>
+        ${e.aliases?.length ? `<span style="opacity:0.75;font-weight:400">(${esc(e.aliases.slice(0, 2).join("/"))})</span>` : ""}
+      </button>
+    `).join("")
+    : `<span style="font-size:12.5px;color:var(--muted)">当前尚未建立实体。你可以直接在上方输入框添加 3~5 个经常讨论的系统或单据名作为冷启动种子。</span>`;
+
+  const srcs = KB.sources || [];
+  $("homeSourceCount").textContent = `${srcs.length} 条记录`;
+  $("homeRecentSources").innerHTML = srcs.length
+    ? srcs.slice(0, 6).map(s => `
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg-subtle)">
+        <div style="min-width:0;flex:1">
+          <div style="font-size:12px;font-weight:600;color:var(--ink)">${esc(s.id)} <span style="font-weight:400;color:var(--muted);margin-left:6px">${esc(s.created_at.replace("T", " "))}</span></div>
+          <div style="font-size:12px;color:var(--ink-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px">${esc(s.preview)}</div>
+        </div>
+        <button class="btn xs" onclick="viewSourceModal('${esc(s.id)}')">查看原文</button>
+      </div>
+    `).join("")
+    : `<div style="font-size:12.5px;color:var(--muted);padding:12px 0">尚未导入任何飞书录音记录。可点击上方「填入示例1」体验完整建图与 Wiki 沉淀流程。</div>`;
+}
+
+// Quick Seed Entity Add on Home Dashboard
+$("btnQuickSeedAdd").onclick = async () => {
+  const name = $("quickSeedName").value.trim();
+  if (!name) return toast("请输入种子实体名称", true);
+  try {
+    await api("/api/entity/save", {
+      name,
+      category: $("quickSeedCat").value,
+      aliases: $("quickSeedAliases").value.split(/[,，]/).map(s => s.trim()).filter(Boolean),
+    });
+    $("quickSeedName").value = "";
+    $("quickSeedAliases").value = "";
+    toast(`已添加种子实体「${name}」`);
+    await refreshKB();
+  } catch (e) {
+    toast(e.message, true);
+  }
+};
+
+// Detect Feishu Speakers in Composer
+function detectSpeakers() {
+  const text = $("sourceInput").value;
+  const matches = [...new Set((text.match(/(说话人\s*\d+|Speaker\s*\d+)/gi) || []).map(x => x.replace(/\s+/g, " ").trim()))];
+  const bar = $("speakerBar");
+  const box = $("speakerInputs");
+  if (!matches.length) {
+    bar.classList.add("hidden");
+    box.innerHTML = "";
+    return;
+  }
+  bar.classList.remove("hidden");
+  const prev = collectSpeakerMap();
+  const defaults = KB.profile?.speaker_defaults || { "说话人 1": "我", "说话人1": "我" };
+  box.innerHTML = matches.map(spk => {
+    const val = prev[spk] ?? defaults[spk] ?? (spk.endsWith("1") ? (KB.profile?.my_name || "我") : "");
+    return `
+      <label class="speaker-chip">
+        <span style="color:var(--muted)">${esc(spk)} ➔</span>
+        <input type="text" data-spk="${esc(spk)}" value="${esc(val)}" placeholder="填写姓名/角色">
+      </label>
+    `;
+  }).join("");
+}
+
+function collectSpeakerMap() {
+  const m = {};
+  document.querySelectorAll("#speakerInputs input[data-spk]").forEach(inp => {
+    if (inp.value.trim()) m[inp.dataset.spk] = inp.value.trim();
+  });
+  return m;
+}
+
+$("sourceInput").addEventListener("input", detectSpeakers);
+
+$("btnSample1").onclick = () => {
+  $("sourceInput").value = `说话人 1 09:30
+早啊王工，今天顺丰那个咖啡快递到了没？我早上看前台堆了一堆箱子。
+
+说话人 2 09:31
+到了到了，刚喝上，昨晚看球差点没起得来哈哈。对了，我们赶紧把【Q4履约改造专项】里那个结算单导出的事对一下吧，财务那边李姐昨天又催了。
+
+说话人 1 09:33
+行，切正题。现在欧姆S（OMS订单系统）往金蝶ERP推数据的时候，【结算单】里缺一个商品保质期字段。李姐的意思是所有生鲜类商品，结算单上的保质期必须是必填项，而且单次异步导出上限先定在 5 万条。
+
+说话人 2 09:36
+5万条没问题，那个导出逻辑本来就是挂在【OMS订单系统】下面的【异步任务中心】跑的。但是保质期必填这块，我建议先确认下【WMS仓储系统】回传的批次号全不全，咱们现在先按必填做，如果老数据有问题再看。另外，结算单的审核状态接口谁来调？
+
+说话人 1 09:38
+审核状态还是由【财务结算组】在金蝶ERP里触发，然后回调我们欧姆S。至于历史老商品没有批次号怎么处理，这个还没定死，你先和仓储那边核对一下方案，我们周四再拍板。`;
+  detectSpeakers();
+  toast("已填入示例1：包含快递闲聊、同音简称（欧姆S）及多实体关系");
+};
+
+$("btnSample2").onclick = () => {
+  $("sourceInput").value = `说话人 1 14:15
+王工，上午跟仓储还有财务李姐拉了个群对清楚了。关于咱们那个【老订单后台】（OMS订单系统）里的【结算单】，之前上午定的是保质期一律必填，但刚查出来2025年以前入库的老商品在【WMS仓储系统】里根本没有录保质期，如果强制必填线上会直接卡死。
+
+说话人 2 14:17
+我就担心这个！那现在怎么改？
+
+说话人 1 14:18
+李姐拍板确认了：结算单的保质期校验规则正式改成「2026年1月1日之后入库的批次必填，历史老批次允许选填并自动打上历史兼容标记」。另外，因为月底大促账单量翻倍，结算单单次异步导出上限从上午说的 5 万条正式上调到 10 万条！
+
+说话人 2 14:20
+明白，改成 10 万条的话，【异步任务中心】需要依赖 Redis 分片队列，我下午把这个加上。`;
+  detectSpeakers();
+  toast("已填入示例2：可测试同名实体自动对齐、5万→10万规则冲突检测及 Living Wiki 增量合并");
+};
+
+$("btnClearSource").onclick = () => {
+  $("sourceInput").value = "";
+  detectSpeakers();
+};
+
+// AI Extract
+$("btnExtract").onclick = async () => {
+  const text = $("sourceInput").value.trim();
+  if (!text) return toast("请先粘贴飞书录音转写或会议文本", true);
+  $("btnExtract").disabled = true;
+  $("extractStatusText").textContent = "⏳ AI 正在剥离闲聊、对齐已有实体并生成增量 Wiki 预览…";
+  try {
+    const r = await api("/api/extract", { text, speaker_map: collectSpeakerMap() });
+    currentDraft = r.draft;
+    currentDraft.blacklisted_terms = currentDraft.blacklisted_terms || [];
+    editingDraftEntIdx = -1;
+    editingDraftRelIdx = -1;
+    editingDraftFactIdx = -1;
+    activeDraftWikiIdx = 0;
+    activeDraftWikiEditMode = false;
+    currentReviewStep = "entities";
+    renderReviewWorkbench();
+    $("reviewWorkbench").classList.remove("hidden");
+    $("idleDashboard").classList.add("hidden");
+    $("extractStatusText").textContent = "✅ 预览已生成，请在下方审阅确认";
+    $("reviewWorkbench").scrollIntoView({ behavior: "smooth" });
+  } catch (e) {
+    $("extractStatusText").textContent = "提取遇到问题：" + e.message;
+    toast(e.message, true);
+  } finally {
+    $("btnExtract").disabled = false;
+  }
+};
+
+// ============================================================================
+// REVIEW WORKBENCH (READ-FIRST, EDIT-ON-DEMAND)
+// ============================================================================
+window.switchReviewStep = (step) => {
+  currentReviewStep = step;
+  document.querySelectorAll("#rvStepTabs .step-tab").forEach(b => {
+    b.classList.toggle("active", b.dataset.step === step);
+  });
+  ["entities", "relations", "facts", "wiki"].forEach(s => {
+    $("rvPane-" + s).classList.toggle("hidden", s !== step);
+  });
+};
+
+$("btnToggleRawJson").onclick = () => {
+  const rawEl = $("rvRawBody");
+  const visEl = $("rvVisualBody");
+  const isRaw = !rawEl.classList.contains("hidden");
+  if (isRaw) {
+    try {
+      currentDraft = JSON.parse($("rvRawTextarea").value);
+      rawEl.classList.add("hidden");
+      visEl.classList.remove("hidden");
+      $("btnToggleRawJson").textContent = "JSON 源码";
+      renderReviewWorkbench();
+    } catch (e) {
+      toast("JSON 格式错误：" + e.message, true);
+    }
+  } else {
+    $("rvRawTextarea").value = JSON.stringify(currentDraft, null, 2);
+    visEl.classList.add("hidden");
+    rawEl.classList.remove("hidden");
+    $("btnToggleRawJson").textContent = "返回可视化审阅";
+  }
+};
+
+$("btnRealign").onclick = async () => {
+  if (!currentDraft) return;
+  try {
+    const bl = currentDraft.blacklisted_terms || [];
+    const r = await api("/api/realign_draft", { draft: currentDraft });
+    currentDraft = r.draft;
+    currentDraft.blacklisted_terms = bl;
+    toast("已按最新实体名称重新同步关系、事实与 Wiki");
+    renderReviewWorkbench();
+  } catch (e) {
+    toast(e.message, true);
+  }
+};
+
+function renderReviewWorkbench() {
+  if (!currentDraft) return;
+  $("rvTitle").textContent = currentDraft.title || "工作对话知识提炼";
+  $("rvSummary").textContent = currentDraft.summary || "";
+
+  const chitchat = currentDraft.filtered_chitchat || [];
+  const spks = currentDraft.speaker_inferences || [];
+  const uncert = currentDraft.uncertainties || [];
+  const noiseItems = [];
+  if (chitchat.length) {
+    noiseItems.push(`<span>🧹 已自动剔除闲聊：${chitchat.map(c => `<del style="margin-right:6px">${esc(c)}</del>`).join("")}</span>`);
+  }
+  if (spks.length) {
+    noiseItems.push(`<span>说话人识别：${spks.map(s => `<b>${esc(s.speaker)}=${esc(s.inferred_name)}</b>`).join("、")}</span>`);
+  }
+  if (uncert.length) {
+    noiseItems.push(`<span style="color:var(--amber)">待确认点：${uncert.map(u => esc(u)).join("；")}</span>`);
+  }
+  $("rvNoiseBar").innerHTML = noiseItems.join(" <span>·</span> ") || `<span>未检测到多余闲聊噪音</span>`;
+
+  const ents = currentDraft.entity_candidates || [];
+  const rels = currentDraft.relation_candidates || [];
+  const facts = currentDraft.facts || [];
+  const wikis = currentDraft.wiki || [];
+
+  $("rvCountEnt").textContent = ents.filter(e => e.approved !== false).length;
+  $("rvCountRel").textContent = rels.filter(r => r.approved !== false).length;
+  $("rvCountFact").textContent = facts.filter(f => f.approved !== false).length;
+  $("rvCountWiki").textContent = wikis.filter(w => w.approved !== false).length;
+
+  renderReviewEntities(ents);
+  renderReviewRelations(rels);
+  renderReviewFacts(facts);
+  renderReviewWikis(wikis);
+  switchReviewStep(currentReviewStep);
+
+  $("rvFooterSummary").innerHTML = `
+    即将入库：<b>${ents.filter(e => e.approved !== false).length}</b> 个实体节点 ·
+    <b>${rels.filter(r => r.approved !== false).length}</b> 条图谱关系 ·
+    <b>${facts.filter(f => f.approved !== false).length}</b> 条时序事实 ·
+    <b>${wikis.filter(w => w.approved !== false).length}</b> 篇实体主 Wiki
+  `;
+}
+
+function renderReviewEntities(ents) {
+  const allTargets = [
+    ...KB.entities.map(e => ({ name: e.name, tag: "已有库" })),
+    ...ents.map(e => ({ name: e.name, tag: "草稿" })),
+  ];
+  const uniqueTargets = [];
+  const seenT = new Set();
+  allTargets.forEach(t => {
+    if (t.name && !seenT.has(t.name)) { seenT.add(t.name); uniqueTargets.push(t); }
+  });
+
+  $("rvEntityGrid").innerHTML = ents.map((ent, idx) => {
+    const approved = ent.approved !== false;
+    const isEditing = editingDraftEntIdx === idx;
+    const isMatch = ent.action === "match";
+    const aliases = ent.aliases || [];
+
+    return `
+      <div class="ent-card ${approved ? "" : "unapproved"}">
+        <div class="ent-card-head">
+          <label class="ent-title-group" style="cursor:pointer">
+            <input type="checkbox" ${approved ? "checked" : ""} onchange="currentDraft.entity_candidates[${idx}].approved=this.checked;renderReviewWorkbench()">
+            <strong>${esc(ent.name)}</strong>
+            <span class="badge ${esc(ent.category)}">${esc(CAT_LABELS[ent.category] || ent.category)}</span>
+            <span class="badge ${isMatch ? "match" : "create"}">${isMatch ? "已对齐库" : "新实体"}</span>
+          </label>
+          <div style="display:flex;gap:4px">
+            <button class="btn xs" onclick="editingDraftEntIdx=(editingDraftEntIdx===${idx}?-1:${idx});renderReviewWorkbench()">
+              ${isEditing ? "收起" : "编辑/合并"}
+            </button>
+            <button class="btn xs danger" onclick="blacklistDraftEnt(${idx})" title="不是实体，加入黑名单">拉黑</button>
+          </div>
+        </div>
+        <div class="ent-desc">${esc(ent.description || ent.reason || "暂无描述")}</div>
+        <div class="ent-aliases">
+          <span>简称/同音别名：</span>
+          ${aliases.length ? aliases.map(a => `<span class="alias-tag">${esc(a)}</span>`).join("") : `<span>无</span>`}
+        </div>
+        ${isEditing ? `
+          <div class="ent-edit-drawer">
+            <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:8px">
+              <div>
+                <label style="font-size:11px;color:var(--muted)">标准实体名</label>
+                <input type="text" class="input" value="${esc(ent.name)}" onchange="renameDraftEntity(${idx}, this.value)">
+              </div>
+              <div>
+                <label style="font-size:11px;color:var(--muted)">分类</label>
+                <select class="input" onchange="currentDraft.entity_candidates[${idx}].category=this.value;renderReviewWorkbench()">
+                  ${["BusinessEntity", "SystemEntity", "Project", "Person"].map(c => `<option value="${c}" ${ent.category === c ? "selected" : ""}>${CAT_LABELS[c]}</option>`).join("")}
+                </select>
+              </div>
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--muted)">口语简称/别名（逗号分隔）</label>
+              <input type="text" class="input" value="${esc(aliases.join(", "))}" onchange="currentDraft.entity_candidates[${idx}].aliases=this.value.split(/[,，]/).map(s=>s.trim()).filter(Boolean);renderReviewWorkbench()">
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--muted)">一句话职责定义</label>
+              <input type="text" class="input" value="${esc(ent.description || "")}" onchange="currentDraft.entity_candidates[${idx}].description=this.value;renderReviewWorkbench()">
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;padding-top:4px">
+              <select class="input" id="rvMergeSel_${idx}" style="font-size:12px;padding:5px">
+                <option value="">作为别名合并入其他实体…</option>
+                ${uniqueTargets.filter(t => t.name !== ent.name).map(t => `<option value="${esc(t.name)}">[${esc(t.tag)}] ${esc(t.name)}</option>`).join("")}
+              </select>
+              <button class="btn sm" onclick="mergeDraftEntity(${idx})">确认合并</button>
+            </div>
+          </div>
+        ` : ""}
+      </div>
+    `;
+  }).join("") || `<div style="color:var(--muted);padding:16px">未识别到实体节点。</div>`;
+}
+
+function renderReviewRelations(rels) {
+  $("rvRelList").innerHTML = rels.map((r, idx) => {
+    const approved = r.approved !== false;
+    const isEditing = editingDraftRelIdx === idx;
+    return `
+      <div class="rel-item ${approved ? "" : "unapproved"}">
+        <input type="checkbox" ${approved ? "checked" : ""} onchange="currentDraft.relation_candidates[${idx}].approved=this.checked;renderReviewWorkbench()">
+        ${!isEditing ? `
+          <div class="rel-flow" onclick="editingDraftRelIdx=${idx};renderReviewWorkbench()" style="cursor:pointer" title="点击可修改此关系连线">
+            <span class="rel-node">${esc(r.from)}</span>
+            <span class="rel-arrow">── ${esc(r.type)} ──►</span>
+            <span class="rel-node">${esc(r.to)}</span>
+            ${r.reason ? `<span style="font-size:12px;color:var(--muted);margin-left:6px">（${esc(r.reason)}）</span>` : ""}
+          </div>
+          <button class="btn xs" onclick="editingDraftRelIdx=${idx};renderReviewWorkbench()">修改</button>
+          <button class="btn xs danger" onclick="currentDraft.relation_candidates.splice(${idx},1);renderReviewWorkbench()">删除</button>
+        ` : `
+          <div style="display:grid;grid-template-columns:1fr 145px 1fr 1.4fr auto;gap:8px;flex:1;align-items:center">
+            <input type="text" class="input" value="${esc(r.from)}" onchange="currentDraft.relation_candidates[${idx}].from=this.value">
+            <select class="input" onchange="currentDraft.relation_candidates[${idx}].type=this.value">
+              ${["PART_OF", "IMPLEMENTED_BY", "DEPENDS_ON", "OWNED_BY", "RELATES_TO", "IS_A"].map(t => `<option value="${t}" ${r.type === t ? "selected" : ""}>${t}</option>`).join("")}
+            </select>
+            <input type="text" class="input" value="${esc(r.to)}" onchange="currentDraft.relation_candidates[${idx}].to=this.value">
+            <input type="text" class="input" value="${esc(r.reason || "")}" placeholder="关系依据" onchange="currentDraft.relation_candidates[${idx}].reason=this.value">
+            <button class="btn sm primary" onclick="editingDraftRelIdx=-1;renderReviewWorkbench()">完成</button>
+          </div>
+        `}
+      </div>
+    `;
+  }).join("") || `<div style="color:var(--muted);padding:16px">本次对话暂无识别出的跨实体关系边。</div>`;
+}
+
+function renderReviewFacts(facts) {
+  $("rvFactList").innerHTML = facts.map((f, idx) => {
+    const approved = f.approved !== false;
+    const isEditing = editingDraftFactIdx === idx;
+    const st = f.status || "discussing";
+    return `
+      <div class="fact-item ${approved ? "" : "unapproved"}">
+        <input type="checkbox" ${approved ? "checked" : ""} onchange="currentDraft.facts[${idx}].approved=this.checked;renderReviewWorkbench()">
+        <button class="badge ${esc(st)}" onclick="cycleDraftFactStatus(${idx})" title="点击切换确认状态" style="cursor:pointer">
+          ${esc(STATUS_LABELS[st] || st)} ↻
+        </button>
+        ${!isEditing ? `
+          <div style="flex:1;min-width:240px;cursor:pointer" onclick="editingDraftFactIdx=${idx};renderReviewWorkbench()" title="点击编辑">
+            <div style="font-size:13.5px">
+              <strong>${esc(f.subject)}</strong> · <span style="color:var(--ink-secondary)">${esc(f.predicate)}</span> ➔
+              <strong style="color:var(--green)">${esc(f.object)}</strong>
+            </div>
+            ${f.evidence ? `<div style="font-size:11.5px;color:var(--muted);margin-top:3px">原话证据：“${esc(f.evidence)}”</div>` : ""}
+          </div>
+          <button class="btn xs" onclick="editingDraftFactIdx=${idx};renderReviewWorkbench()">编辑</button>
+          <button class="btn xs danger" onclick="currentDraft.facts.splice(${idx},1);renderReviewWorkbench()">删除</button>
+        ` : `
+          <div style="display:grid;grid-template-columns:1fr 1fr 1.3fr 1.3fr auto;gap:8px;flex:1;align-items:center">
+            <input type="text" class="input" value="${esc(f.subject)}" placeholder="主体实体" onchange="currentDraft.facts[${idx}].subject=this.value">
+            <input type="text" class="input" value="${esc(f.predicate)}" placeholder="规则属性" onchange="currentDraft.facts[${idx}].predicate=this.value">
+            <input type="text" class="input" value="${esc(f.object)}" placeholder="结论值" onchange="currentDraft.facts[${idx}].object=this.value">
+            <input type="text" class="input" value="${esc(f.evidence || "")}" placeholder="原话证据" onchange="currentDraft.facts[${idx}].evidence=this.value">
+            <button class="btn sm primary" onclick="editingDraftFactIdx=-1;renderReviewWorkbench()">完成</button>
+          </div>
+        `}
+        ${f.conflict ? `
+          <div class="conflict-alert">
+            <span>⚡ <b>规则演进检测</b>：库中「${esc(f.subject)} · ${esc(f.predicate)}」原已确认值为 <b>「${esc(f.conflict.old_object)}」</b>。本次以“已确认”入库后，旧规则将自动归档为历史记录。</span>
+          </div>
+        ` : ""}
+      </div>
+    `;
+  }).join("") || `<div style="color:var(--muted);padding:16px">暂无提取出的时序事实条目。</div>`;
+}
+
+window.cycleDraftFactStatus = (idx) => {
+  const order = ["confirmed", "discussing", "proposed", "historical"];
+  const cur = currentDraft.facts[idx].status || "discussing";
+  const next = order[(order.indexOf(cur) + 1) % order.length];
+  currentDraft.facts[idx].status = next;
+  renderReviewWorkbench();
+};
+
+function renderReviewWikis(wikis) {
+  if (!wikis.length) {
+    $("rvWikiSidebar").innerHTML = "";
+    $("rvWikiMain").innerHTML = `<div style="color:var(--muted)">暂无生成的 Living Wiki。</div>`;
+    return;
+  }
+  if (activeDraftWikiIdx >= wikis.length) activeDraftWikiIdx = 0;
+
+  $("rvWikiSidebar").innerHTML = wikis.map((w, idx) => `
+    <button class="wiki-dir-btn ${idx === activeDraftWikiIdx ? "active" : ""}" onclick="activeDraftWikiIdx=${idx};activeDraftWikiEditMode=false;renderReviewWorkbench()">
+      <span>${esc(w.entity || w.title)}</span>
+      <span class="badge ${w.is_update ? "match" : "create"}">${w.is_update ? "增量合并" : "新建档案"}</span>
+    </button>
+  `).join("");
+
+  const w = wikis[activeDraftWikiIdx];
+  $("rvWikiMain").innerHTML = `
+    <div style="border:1px solid var(--line);border-radius:10px;padding:18px 22px;background:var(--bg-card)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--line);flex-wrap:wrap;gap:8px">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="badge ${w.is_update ? "match" : "create"}">${w.is_update ? "增量更新已有实体 Wiki" : "首次新建实体主 Wiki"}</span>
+          <span style="font-size:12px;color:var(--muted)">文件：<code>10_wiki/${esc(w.category || "BusinessEntity")}__${esc(w.entity)}.md</code></span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn xs" onclick="activeDraftWikiEditMode=!activeDraftWikiEditMode;renderReviewWorkbench()">
+            ${activeDraftWikiEditMode ? "预览排版效果" : "编辑 Markdown"}
+          </button>
+          <label style="font-size:12px;display:flex;align-items:center;gap:5px;cursor:pointer">
+            <input type="checkbox" ${w.approved !== false ? "checked" : ""} onchange="currentDraft.wiki[${activeDraftWikiIdx}].approved=this.checked;renderReviewWorkbench()">
+            写入此篇
+          </label>
+        </div>
+      </div>
+      ${w.is_update && w.existing_content ? `
+        <details style="margin-bottom:12px;background:var(--bg-subtle);padding:8px 12px;border-radius:8px;border:1px solid var(--line)">
+          <summary style="cursor:pointer;font-size:12px;font-weight:600;color:var(--ink-secondary)">展开查看合并前的旧版 Wiki 内容</summary>
+          <pre style="white-space:pre-wrap;font-size:12px;color:var(--muted);margin-top:8px;font-family:Consolas,monospace">${esc(w.existing_content)}</pre>
+        </details>
+      ` : ""}
+      ${activeDraftWikiEditMode ? `
+        <textarea class="input" style="min-height:340px;font-family:Consolas,monospace;line-height:1.7" onchange="currentDraft.wiki[${activeDraftWikiIdx}].content=this.value">${esc(w.content)}</textarea>
+      ` : `
+        <div class="md-doc">${renderMarkdown(w.content)}</div>
+      `}
+    </div>
+  `;
+}
+
+// Draft Manipulation Actions
+window.renameDraftEntity = (idx, newName) => {
+  newName = newName.trim();
+  if (!newName) return;
+  const oldName = currentDraft.entity_candidates[idx].name;
+  currentDraft.entity_candidates[idx].name = newName;
+  if (oldName && oldName !== newName) {
+    const al = currentDraft.entity_candidates[idx].aliases || [];
+    if (!al.includes(oldName)) al.push(oldName);
+    currentDraft.entity_candidates[idx].aliases = al;
+    cascadeRenameInDraft(oldName, newName);
+  }
+  renderReviewWorkbench();
+};
+
+window.mergeDraftEntity = (idx) => {
+  const sel = $("rvMergeSel_" + idx);
+  const targetName = sel ? sel.value.trim() : "";
+  if (!targetName) return toast("请先选择合并的目标实体", true);
+  const srcEnt = currentDraft.entity_candidates[idx];
+  const oldName = srcEnt.name;
+
+  let tgt = currentDraft.entity_candidates.find(e => e.name === targetName);
+  if (!tgt) {
+    const kbEnt = KB.entities.find(e => e.name === targetName);
+    if (kbEnt) {
+      tgt = {
+        name: kbEnt.name,
+        category: kbEnt.category,
+        entity_type: kbEnt.entity_type,
+        action: "match",
+        existing_id: kbEnt.id,
+        aliases: [...(kbEnt.aliases || [])],
+        description: kbEnt.description || "",
+        properties: { ...(kbEnt.properties || {}) },
+        approved: true,
+      };
+      currentDraft.entity_candidates.push(tgt);
+    }
+  }
+  if (tgt) {
+    const merged = new Set([...(tgt.aliases || []), oldName, ...(srcEnt.aliases || [])]);
+    merged.delete(targetName);
+    tgt.aliases = [...merged];
+  }
+  currentDraft.entity_candidates.splice(idx, 1);
+  editingDraftEntIdx = -1;
+  cascadeRenameInDraft(oldName, targetName);
+  toast(`已将「${oldName}」作为别名合并入「${targetName}」`);
+  renderReviewWorkbench();
+};
+
+window.blacklistDraftEnt = (idx) => {
+  const badName = currentDraft.entity_candidates[idx].name;
+  currentDraft.blacklisted_terms = currentDraft.blacklisted_terms || [];
+  if (badName && !currentDraft.blacklisted_terms.includes(badName)) {
+    currentDraft.blacklisted_terms.push(badName);
+  }
+  currentDraft.entity_candidates.splice(idx, 1);
+  currentDraft.relation_candidates = (currentDraft.relation_candidates || []).filter(r => r.from !== badName && r.to !== badName);
+  currentDraft.wiki = (currentDraft.wiki || []).filter(w => w.entity !== badName);
+  editingDraftEntIdx = -1;
+  toast(`已剔除「${badName}」并加入禁抽黑名单`);
+  renderReviewWorkbench();
+};
+
+function cascadeRenameInDraft(oldName, newName) {
+  (currentDraft.relation_candidates || []).forEach(r => {
+    if (r.from === oldName) r.from = newName;
+    if (r.to === oldName) r.to = newName;
+  });
+  (currentDraft.facts || []).forEach(f => {
+    if (f.subject === oldName) f.subject = newName;
+  });
+  (currentDraft.wiki || []).forEach(w => {
+    if (w.entity === oldName) { w.entity = newName; w.title = newName; }
+  });
+}
+
+window.addDraftEntity = () => {
+  currentDraft.entity_candidates.unshift({
+    name: "新实体",
+    category: "BusinessEntity",
+    entity_type: "核心对象",
+    action: "create",
+    aliases: [],
+    description: "",
+    approved: true,
+  });
+  editingDraftEntIdx = 0;
+  renderReviewWorkbench();
+};
+
+window.addDraftRelation = () => {
+  const e1 = currentDraft.entity_candidates?.[0]?.name || "";
+  const e2 = currentDraft.entity_candidates?.[1]?.name || "";
+  currentDraft.relation_candidates.unshift({
+    from: e1, type: "RELATES_TO", to: e2, reason: "", approved: true,
+  });
+  editingDraftRelIdx = 0;
+  renderReviewWorkbench();
+};
+
+window.addDraftFact = () => {
+  const e1 = currentDraft.entity_candidates?.[0]?.name || "";
+  currentDraft.facts.unshift({
+    date: new Date().toISOString().slice(0, 10),
+    subject: e1, predicate: "", object: "", status: "confirmed", evidence: "", approved: true,
+  });
+  editingDraftFactIdx = 0;
+  renderReviewWorkbench();
+};
+
+// Commit Reviewed Draft
+$("btnCommitDraft").onclick = async () => {
+  try {
+    if (!$("rvRawBody").classList.contains("hidden")) {
+      currentDraft = JSON.parse($("rvRawTextarea").value);
+    }
+    $("btnCommitDraft").disabled = true;
+    const r = await api("/api/commit", {
+      draft: currentDraft,
+      source: $("sourceInput").value,
+      speaker_map: collectSpeakerMap(),
+    });
+    currentDraft = null;
+    $("reviewWorkbench").classList.add("hidden");
+    $("idleDashboard").classList.remove("hidden");
+    await refreshKB();
+    toast(`入库成功！新增实体 ${r.entities_added} · 更新实体 ${r.entities_updated} · 关系 ${r.relation_candidates} · Wiki ${r.wiki_files.length} 篇`);
+  } catch (e) {
+    toast("入库失败：" + e.message, true);
+  } finally {
+    $("btnCommitDraft").disabled = false;
+  }
+};
+
+$("btnDiscardDraft").onclick = () => {
+  currentDraft = null;
+  $("reviewWorkbench").classList.add("hidden");
+  $("idleDashboard").classList.remove("hidden");
+  toast("已放弃草稿");
+};
+
+// ============================================================================
+// VIEW 2: KNOWLEDGE GRAPH CANVAS
+// ============================================================================
+let graphNodes = [];
+let graphEdges = [];
+let cam = { x: 0, y: 0, zoom: 1 };
+let dragNode = null;
+let isPanning = false;
+let panStart = { x: 0, y: 0 };
+
+function syncGraphNodes() {
+  const oldPos = {};
+  graphNodes.forEach(n => { oldPos[n.name] = { x: n.x, y: n.y }; });
+  const ents = KB.entities || [];
+  const total = ents.length || 1;
+  graphNodes = ents.map((e, i) => {
+    const angle = (2 * Math.PI * i) / total;
+    const rad = Math.min(220, 65 + total * 15);
+    const p = oldPos[e.name];
+    return {
+      id: e.id,
+      name: e.name,
+      category: e.category || "BusinessEntity",
+      aliases: e.aliases || [],
+      raw: e,
+      x: p ? p.x : Math.cos(angle) * rad + (Math.random() - 0.5) * 15,
+      y: p ? p.y : Math.sin(angle) * rad + (Math.random() - 0.5) * 15,
+      vx: 0, vy: 0,
+    };
+  });
+  const map = {};
+  graphNodes.forEach(n => { map[n.name.toLowerCase()] = n; });
+  graphEdges = [];
+  (KB.relations || []).forEach(r => {
+    const s = map[(r.from || "").toLowerCase()];
+    const t = map[(r.to || "").toLowerCase()];
+    if (s && t && s !== t) {
+      graphEdges.push({ id: r.id, source: s, target: t, type: r.type, reason: r.reason || "" });
+    }
+  });
+  runForceLayout(85);
+  drawGraph();
+}
+
+window.runForceLayout = (steps = 60) => {
+  for (let s = 0; s < steps; s++) {
+    for (let i = 0; i < graphNodes.length; i++) {
+      for (let j = i + 1; j < graphNodes.length; j++) {
+        const a = graphNodes[i], b = graphNodes[j];
+        let dx = b.x - a.x, dy = b.y - a.y;
+        let d2 = dx * dx + dy * dy + 1;
+        let f = 5800 / d2;
+        let d = Math.sqrt(d2);
+        a.vx -= (dx / d) * f; a.vy -= (dy / d) * f;
+        b.vx += (dx / d) * f; b.vy += (dy / d) * f;
+      }
+    }
+    for (const e of graphEdges) {
+      let dx = e.target.x - e.source.x, dy = e.target.y - e.source.y;
+      let d = Math.sqrt(dx * dx + dy * dy) || 1;
+      let diff = (d - 165) * 0.035;
+      e.source.vx += (dx / d) * diff; e.source.vy += (dy / d) * diff;
+      e.target.vx -= (dx / d) * diff; e.target.vy -= (dy / d) * diff;
+    }
+    for (const n of graphNodes) {
+      n.vx -= n.x * 0.012; n.vy -= n.y * 0.012;
+      n.x += Math.max(-8, Math.min(8, n.vx));
+      n.y += Math.max(-8, Math.min(8, n.vy));
+      n.vx *= 0.65; n.vy *= 0.65;
+    }
+  }
+};
+
+function resizeCanvas() {
+  const c = $("graphCanvas");
+  if (!c) return;
+  const r = c.parentElement.getBoundingClientRect();
+  c.width = r.width * window.devicePixelRatio;
+  c.height = r.height * window.devicePixelRatio;
+}
+
+window.setGraphCatFilter = (cat) => {
+  graphCatFilter = cat;
+  document.querySelectorAll(".filter-chip[data-cat]").forEach(b => {
+    b.classList.toggle("active", b.dataset.cat === cat);
+  });
+  drawGraph();
+};
+
+window.resetGraphCamera = () => {
+  cam = { x: 0, y: 0, zoom: 1 };
+  selectedGraphNodeId = "";
+  $("graphInspectorDrawer").classList.add("hidden");
+  drawGraph();
+};
+
+function drawGraph() {
+  const c = $("graphCanvas");
+  if (!c || c.width === 0) return;
+  const ctx = c.getContext("2d");
+  const dpr = window.devicePixelRatio || 1;
+  const w = c.width / dpr, h = c.height / dpr;
+
+  ctx.save();
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, w, h);
+
+  // Subtle dot grid background
+  ctx.fillStyle = "#dcdfd2";
+  const gridStep = 28;
+  for (let gx = (cam.x % gridStep + gridStep) % gridStep; gx < w; gx += gridStep) {
+    for (let gy = (cam.y % gridStep + gridStep) % gridStep; gy < h; gy += gridStep) {
+      ctx.fillRect(gx, gy, 1.2, 1.2);
+    }
+  }
+
+  const q = ($("graphSearchInput")?.value || "").trim().toLowerCase();
+  const visible = new Set();
+  graphNodes.forEach(n => {
+    const okCat = !graphCatFilter || n.category === graphCatFilter;
+    const okQ = !q || n.name.toLowerCase().includes(q) || (n.aliases || []).some(a => a.toLowerCase().includes(q));
+    if (okCat && okQ) visible.add(n);
+  });
+
+  const neighbors = new Set();
+  if (selectedGraphNodeId) {
+    graphEdges.forEach(e => {
+      if (e.source.id === selectedGraphNodeId) neighbors.add(e.target.id);
+      if (e.target.id === selectedGraphNodeId) neighbors.add(e.source.id);
+    });
+  }
+
+  ctx.translate(w / 2 + cam.x, h / 2 + cam.y);
+  ctx.scale(cam.zoom, cam.zoom);
+
+  if (!graphNodes.length) {
+    ctx.fillStyle = "#798272";
+    ctx.font = "14px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("知识图谱尚无实体节点。点击右上角「+ 录入种子实体」或导入飞书录音即可自动建图。", 0, 0);
+    ctx.restore();
+    return;
+  }
+
+  // Edges
+  graphEdges.forEach(e => {
+    if (!visible.has(e.source) && !visible.has(e.target)) return;
+    const active = selectedGraphNodeId && (e.source.id === selectedGraphNodeId || e.target.id === selectedGraphNodeId);
+    const dim = selectedGraphNodeId && !active;
+
+    ctx.strokeStyle = active ? "#285848" : (dim ? "#e2e5d8" : "#c2c9b8");
+    ctx.lineWidth = active ? 2.2 : 1.4;
+    ctx.beginPath();
+    ctx.moveTo(e.source.x, e.source.y);
+    ctx.lineTo(e.target.x, e.target.y);
+    ctx.stroke();
+
+    const ang = Math.atan2(e.target.y - e.source.y, e.target.x - e.source.x);
+    const ax = e.target.x - Math.cos(ang) * 22;
+    const ay = e.target.y - Math.sin(ang) * 22;
+    ctx.fillStyle = ctx.strokeStyle;
+    ctx.beginPath();
+    ctx.moveTo(ax, ay);
+    ctx.lineTo(ax - 7 * Math.cos(ang - Math.PI / 6), ay - 7 * Math.sin(ang - Math.PI / 6));
+    ctx.lineTo(ax - 7 * Math.cos(ang + Math.PI / 6), ay - 7 * Math.sin(ang + Math.PI / 6));
+    ctx.closePath();
+    ctx.fill();
+
+    if (!dim) {
+      const mx = (e.source.x + e.target.x) / 2;
+      const my = (e.source.y + e.target.y) / 2;
+      ctx.font = "10.5px sans-serif";
+      ctx.fillStyle = active ? "#285848" : "#798272";
+      ctx.textAlign = "center";
+      ctx.fillText(e.type, mx, my - 5);
+    }
+  });
+
+  // Nodes
+  graphNodes.forEach(n => {
+    if (!visible.has(n)) return;
+    const isSel = n.id === selectedGraphNodeId;
+    const isNb = neighbors.has(n.id);
+    const dim = selectedGraphNodeId && !isSel && !isNb;
+    ctx.globalAlpha = dim ? 0.28 : 1;
+
+    const col = CAT_COLORS[n.category] || "#285848";
+    if (isSel) {
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, 25, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(40, 88, 72, 0.16)";
+      ctx.fill();
+    }
+
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, 17, 0, Math.PI * 2);
+    ctx.fillStyle = col;
+    ctx.fill();
+    ctx.lineWidth = 2.5;
+    ctx.strokeStyle = "#fffffa";
+    ctx.stroke();
+
+    ctx.fillStyle = "#253f34";
+    ctx.font = (isSel ? "650 " : "550 ") + "12.5px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(n.name, n.x, n.y + 31);
+
+    if (n.aliases?.length) {
+      ctx.fillStyle = "#798272";
+      ctx.font = "10.5px sans-serif";
+      ctx.fillText(n.aliases.slice(0, 2).join(" / "), n.x, n.y + 44);
+    }
+    ctx.globalAlpha = 1;
+  });
+
+  ctx.restore();
+}
+
+const gCanvas = $("graphCanvas");
+function toWorld(cx, cy) {
+  const r = gCanvas.getBoundingClientRect();
+  return {
+    x: (cx - r.left - r.width / 2 - cam.x) / cam.zoom,
+    y: (cy - r.top - r.height / 2 - cam.y) / cam.zoom,
+  };
+}
+
+gCanvas.addEventListener("mousedown", e => {
+  const pt = toWorld(e.clientX, e.clientY);
+  const hit = graphNodes.find(n => Math.hypot(n.x - pt.x, n.y - pt.y) < 20);
+  if (hit) {
+    dragNode = hit;
+    openGraphDrawer(hit.raw);
+  } else {
+    isPanning = true;
+    panStart = { x: e.clientX - cam.x, y: e.clientY - cam.y };
+  }
+});
+window.addEventListener("mousemove", e => {
+  if (dragNode) {
+    const pt = toWorld(e.clientX, e.clientY);
+    dragNode.x = pt.x; dragNode.y = pt.y;
+    drawGraph();
+  } else if (isPanning) {
+    cam.x = e.clientX - panStart.x;
+    cam.y = e.clientY - panStart.y;
+    drawGraph();
+  }
+});
+window.addEventListener("mouseup", () => { dragNode = null; isPanning = false; });
+gCanvas.addEventListener("wheel", e => {
+  e.preventDefault();
+  cam.zoom = Math.max(0.35, Math.min(2.5, cam.zoom * (e.deltaY < 0 ? 1.1 : 0.9)));
+  drawGraph();
+}, { passive: false });
+$("graphSearchInput").oninput = drawGraph;
+window.addEventListener("resize", () => { if (currentView === "graph") { resizeCanvas(); drawGraph(); } });
+
+function openGraphDrawer(ent) {
+  selectedGraphNodeId = ent.id;
+  drawGraph();
+  const drawer = $("graphInspectorDrawer");
+  drawer.classList.remove("hidden");
+  $("gdCatBadge").className = "badge " + ent.category;
+  $("gdCatBadge").textContent = CAT_LABELS[ent.category] || ent.category;
+  $("gdTitle").textContent = ent.name;
+
+  const edges = (KB.relations || []).filter(r => r.from === ent.name || r.to === ent.name);
+  const myFacts = (KB.facts || []).filter(f => f.subject === ent.name).slice(0, 6);
+  const mergeOpts = (KB.entities || []).filter(e => e.id !== ent.id).map(e => `<option value="${esc(e.id)}">${esc(e.name)}</option>`).join("");
+
+  $("gdBody").innerHTML = `
+    <div style="font-size:13px;color:var(--ink-secondary);line-height:1.6">${esc(ent.description || "暂无描述")}</div>
+    <div>
+      <div style="font-size:11.5px;color:var(--muted);margin-bottom:5px">口语简称 / 别名</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        ${(ent.aliases || []).length ? ent.aliases.map(a => `<span class="alias-tag">${esc(a)}</span>`).join("") : `<span style="font-size:12px;color:var(--muted)">无别名</span>`}
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;padding:6px 0;border-bottom:1px solid var(--line)">
+      <button class="btn primary sm" onclick="jumpToEntityWiki('${esc(ent.name)}')">阅读 Living Wiki</button>
+      <button class="btn sm" onclick="openSeedModal('${esc(ent.id)}')">编辑属性/别名</button>
+      <button class="btn sm danger" onclick="deleteEntityFromGraph('${esc(ent.id)}')">删除</button>
+    </div>
+
+    <div>
+      <div style="font-size:12px;font-weight:650;margin-bottom:6px">上下游关系连线 (${edges.length})</div>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        ${edges.map(r => `
+          <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:6px 8px;background:var(--bg-subtle);border-radius:6px">
+            <span><b>${esc(r.from)}</b> ──(${esc(r.type)})──► <b>${esc(r.to)}</b></span>
+            <button class="btn xs danger" onclick="deleteGraphEdge('${esc(r.id)}')">删</button>
+          </div>
+        `).join("") || `<span style="font-size:12px;color:var(--muted)">暂无连线</span>`}
+      </div>
+      <div style="display:grid;grid-template-columns:110px 1fr auto;gap:5px;margin-top:8px">
+        <select class="input" id="gdNewEdgeType" style="padding:4px 6px;font-size:11.5px">
+          <option value="RELATES_TO">RELATES_TO</option>
+          <option value="PART_OF">PART_OF</option>
+          <option value="IMPLEMENTED_BY">IMPLEMENTED_BY</option>
+          <option value="DEPENDS_ON">DEPENDS_ON</option>
+          <option value="OWNED_BY">OWNED_BY</option>
+        </select>
+        <input type="text" class="input" id="gdNewEdgeTarget" placeholder="目标实体名…" style="padding:4px 8px;font-size:12px">
+        <button class="btn sm" onclick="addGraphEdgeFromDrawer('${esc(ent.name)}')">+连线</button>
+      </div>
+    </div>
+
+    ${mergeOpts ? `
+    <div style="padding-top:8px;border-top:1px solid var(--line)">
+      <div style="font-size:12px;font-weight:650;margin-bottom:5px">合并重复节点</div>
+      <div style="display:flex;gap:6px">
+        <select class="input" id="gdMergeTarget" style="padding:4px 8px;font-size:12px;flex:1">
+          <option value="">将「${esc(ent.name)}」并入…</option>
+          ${mergeOpts}
+        </select>
+        <button class="btn sm" onclick="mergeFromDrawer('${esc(ent.id)}')">合并</button>
+      </div>
+    </div>` : ""}
+
+    <div style="padding-top:8px;border-top:1px solid var(--line)">
+      <div style="font-size:12px;font-weight:650;margin-bottom:6px">近期事实断言 (${myFacts.length})</div>
+      ${myFacts.map(f => `
+        <div style="font-size:12px;padding:6px 0;border-bottom:1px dashed var(--line)">
+          <span class="badge ${esc(f.status)}">${esc(STATUS_LABELS[f.status] || f.status)}</span>
+          <b>${esc(f.predicate)}</b>：${esc(f.object)}
+        </div>
+      `).join("") || `<span style="font-size:12px;color:var(--muted)">暂无事实记录</span>`}
+    </div>
+  `;
+}
+
+window.closeGraphDrawer = () => {
+  selectedGraphNodeId = "";
+  $("graphInspectorDrawer").classList.add("hidden");
+  drawGraph();
+};
+
+window.addGraphEdgeFromDrawer = async (fromName) => {
+  const toName = $("gdNewEdgeTarget").value.trim();
+  const type = $("gdNewEdgeType").value;
+  if (!toName) return toast("请输入目标实体名称", true);
+  try {
+    await api("/api/relation/save", { from: fromName, type, to: toName });
+    await refreshKB();
+    const cur = KB.entities.find(e => e.id === selectedGraphNodeId);
+    if (cur) openGraphDrawer(cur);
+    toast("已添加关系连线");
+  } catch (e) {
+    toast(e.message, true);
+  }
+};
+
+window.deleteGraphEdge = async (rid) => {
+  await api("/api/relation/delete", { id: rid });
+  await refreshKB();
+  const cur = KB.entities.find(e => e.id === selectedGraphNodeId);
+  if (cur) openGraphDrawer(cur);
+};
+
+window.mergeFromDrawer = async (srcId) => {
+  const tgtId = $("gdMergeTarget").value;
+  if (!tgtId) return toast("请选择要并入的目标实体", true);
+  try {
+    const r = await api("/api/entity/merge", { source: srcId, target: tgtId });
+    await refreshKB();
+    openGraphDrawer(r.target);
+    toast(`合并完成！已归并至「${r.target.name}」`);
+  } catch (e) {
+    toast(e.message, true);
+  }
+};
+
+window.deleteEntityFromGraph = async (eid) => {
+  try {
+    await api("/api/entity/delete", { id: eid, add_to_blacklist: false });
+    closeGraphDrawer();
+    await refreshKB();
+    toast("已删除该实体节点");
+  } catch (e) {
+    toast(e.message, true);
+  }
+};
+
+// ============================================================================
+// VIEW 3: LIVING WIKI ARCHIVE
+// ============================================================================
+function renderWikiView() {
+  const q = ($("wikiFilterInput")?.value || "").trim().toLowerCase();
+  const wikis = (KB.wikis || []).filter(w =>
+    !q || w.entity.toLowerCase().includes(q) || (w.content || "").toLowerCase().includes(q)
+  );
+
+  if (!activeWikiEntityName && wikis.length) {
+    activeWikiEntityName = wikis[0].entity;
+  }
+
+  // Group directory by category
+  const groups = { BusinessEntity: [], SystemEntity: [], Project: [], Person: [] };
+  wikis.forEach(w => {
+    const c = groups[w.category] ? w.category : "BusinessEntity";
+    groups[c].push(w);
+  });
+
+  $("wikiDirectory").innerHTML = Object.entries(groups).map(([cat, list]) => {
+    if (!list.length) return "";
+    return `
+      <div class="wiki-dir-group">
+        <div class="wiki-dir-label">${esc(CAT_LABELS[cat] || cat)} (${list.length})</div>
+        ${list.map(w => `
+          <button class="wiki-dir-btn ${w.entity === activeWikiEntityName ? "active" : ""}" onclick="selectWikiArchive('${esc(w.entity)}')">
+            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(w.entity)}</span>
+          </button>
+        `).join("")}
+      </div>
+    `;
+  }).join("") || `<div style="color:var(--muted);padding:12px;font-size:12.5px">暂无 Living Wiki 档案</div>`;
+
+  const cur = (KB.wikis || []).find(w => w.entity === activeWikiEntityName);
+  const entObj = (KB.entities || []).find(e => e.name === activeWikiEntityName);
+
+  if (cur) {
+    $("wikiPaperMeta").innerHTML = `
+      <span class="badge ${esc(cur.category)}">${esc(CAT_LABELS[cur.category] || cur.category)}</span>
+      ${entObj?.aliases?.length ? `<span style="font-size:12px;color:var(--muted)">简称：${esc(entObj.aliases.join(" / "))}</span>` : ""}
+      <span style="font-size:11.5px;color:var(--muted)">更新于 ${esc((cur.updated_at || "").replace("T", " "))}</span>
+    `;
+    $("wikiRenderedDoc").innerHTML = renderMarkdown(cur.content);
+    $("wikiEditorArea").value = cur.content;
+    $("btnToggleWikiEdit").classList.remove("hidden");
+    $("btnJumpGraphFromWiki").classList.toggle("hidden", !entObj);
+    if (entObj) {
+      $("btnJumpGraphFromWiki").onclick = () => {
+        switchView("graph");
+        setTimeout(() => openGraphDrawer(entObj), 50);
+      };
+    }
+  } else {
+    $("wikiPaperMeta").innerHTML = "";
+    $("wikiRenderedDoc").innerHTML = `<p style="color:var(--muted);padding:30px 0;text-align:center">请从左侧目录选择一个实体，或先在「录音转写整理」导入工作对话生成 Living Wiki。</p>`;
+    $("btnToggleWikiEdit").classList.add("hidden");
+    $("btnSaveWikiDoc").classList.add("hidden");
+    $("btnJumpGraphFromWiki").classList.add("hidden");
+  }
+
+  // Right sidebar: Relations + Facts of this entity
+  const rels = (KB.relations || []).filter(r => r.from === activeWikiEntityName || r.to === activeWikiEntityName);
+  $("wikiSideRelations").innerHTML = rels.length
+    ? rels.map(r => `
+      <div style="font-size:12px;padding:6px 9px;background:var(--bg-subtle);border-radius:6px;margin-bottom:5px;cursor:pointer" onclick="selectWikiArchive('${esc(r.from === activeWikiEntityName ? r.to : r.from)}')">
+        <b>${esc(r.from)}</b> <span style="color:var(--green)">── ${esc(r.type)} ──►</span> <b>${esc(r.to)}</b>
+      </div>
+    `).join("")
+    : `<div style="font-size:12px;color:var(--muted)">暂无直接关联图谱边</div>`;
+
+  const facts = (KB.facts || []).filter(f => f.subject === activeWikiEntityName);
+  $("wikiSideFacts").innerHTML = facts.length
+    ? facts.map(f => `
+      <div class="timeline-card ${esc(f.status || "discussing")}">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <button class="badge ${esc(f.status)}" onclick="cycleSavedFactStatus('${esc(f.id)}', '${esc(f.status)}')" title="点击切换状态" style="cursor:pointer">
+            ${esc(STATUS_LABELS[f.status] || f.status)} ↻
+          </button>
+          <span style="font-size:11px;color:var(--muted)">${esc(f.date || "")}</span>
+        </div>
+        <div style="font-size:12.5px"><b>${esc(f.predicate)}</b>：${esc(f.object)}</div>
+        ${f.evidence ? `<div style="font-size:11.5px;color:var(--muted);margin-top:3px">“${esc(f.evidence)}”</div>` : ""}
+        ${f.source_id ? `<button class="btn xs" style="margin-top:5px" onclick="viewSourceModal('${esc(f.source_id)}')">溯源录音 ${esc(f.source_id.slice(0, 12))}</button>` : ""}
+      </div>
+    `).join("")
+    : `<div style="font-size:12px;color:var(--muted)">该实体暂无时序事实记录</div>`;
+}
+
+window.selectWikiArchive = (ename) => {
+  activeWikiEntityName = ename;
+  $("wikiEditorArea").classList.add("hidden");
+  $("wikiRenderedDoc").classList.remove("hidden");
+  $("btnSaveWikiDoc").classList.add("hidden");
+  $("btnToggleWikiEdit").textContent = "编辑文档";
+  renderWikiView();
+};
+
+$("wikiFilterInput").oninput = renderWikiView;
+
+$("btnToggleWikiEdit").onclick = () => {
+  const isEditing = !$("wikiEditorArea").classList.contains("hidden");
+  $("wikiEditorArea").classList.toggle("hidden", isEditing);
+  $("wikiRenderedDoc").classList.toggle("hidden", !isEditing);
+  $("btnSaveWikiDoc").classList.toggle("hidden", isEditing);
+  $("btnToggleWikiEdit").textContent = isEditing ? "编辑文档" : "取消编辑";
+};
+
+$("btnSaveWikiDoc").onclick = async () => {
+  const cur = (KB.wikis || []).find(w => w.entity === activeWikiEntityName);
+  if (!cur) return;
+  try {
+    await api("/api/wiki/save", {
+      entity: cur.entity,
+      category: cur.category,
+      content: $("wikiEditorArea").value,
+    });
+    toast("Living Wiki 已保存更新");
+    await refreshKB();
+    selectWikiArchive(cur.entity);
+  } catch (e) {
+    toast(e.message, true);
+  }
+};
+
+window.cycleSavedFactStatus = async (fid, curStatus) => {
+  const order = ["confirmed", "discussing", "proposed", "historical"];
+  const next = order[(order.indexOf(curStatus) + 1) % order.length];
+  try {
+    await api("/api/fact/update", { id: fid, status: next });
+    toast(`事实状态已更新为「${STATUS_LABELS[next]}」`);
+    await refreshKB();
+  } catch (e) {
+    toast(e.message, true);
+  }
+};
+
+// ============================================================================
+// VIEW 4: FACTS STREAM VIEW
+// ============================================================================
+window.renderFactsStreamView = () => {
+  const st = $("factsViewStatusFilter")?.value || "";
+  const q = ($("factsViewSearch")?.value || "").trim().toLowerCase();
+  const list = (KB.facts || []).filter(f => {
+    if (st && f.status !== st) return false;
+    if (q) {
+      const hay = `${f.subject} ${f.predicate} ${f.object} ${f.evidence}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  $("factsStreamContainer").innerHTML = list.length
+    ? list.map(f => `
+      <div style="display:flex;align-items:center;gap:14px;padding:12px 14px;border-bottom:1px solid #ebede2;flex-wrap:wrap">
+        <button class="badge ${esc(f.status)}" onclick="cycleSavedFactStatus('${esc(f.id)}', '${esc(f.status)}')" style="cursor:pointer" title="点击切换状态">
+          ${esc(STATUS_LABELS[f.status] || f.status)} ↻
+        </button>
+        <span style="font-size:12px;color:var(--muted);min-width:85px">${esc(f.date || "")}</span>
+        <div style="flex:1;min-width:260px">
+          <div style="font-size:13.5px">
+            <strong style="cursor:pointer;text-decoration:underline;text-underline-offset:3px" onclick="jumpToEntityWiki('${esc(f.subject)}')">${esc(f.subject)}</strong>
+            · <span style="color:var(--ink-secondary)">${esc(f.predicate)}</span> ➔
+            <strong style="color:var(--green)">${esc(f.object)}</strong>
+          </div>
+          ${f.evidence ? `<div style="font-size:12px;color:var(--muted);margin-top:3px">原话证据：“${esc(f.evidence)}”</div>` : ""}
+        </div>
+        ${f.source_id ? `<button class="btn xs" onclick="viewSourceModal('${esc(f.source_id)}')">查看录音原文</button>` : ""}
+      </div>
+    `).join("")
+    : `<div style="padding:24px;text-align:center;color:var(--muted)">暂无符合筛选条件的事实记录</div>`;
+};
+
+// ============================================================================
+// MODALS: SEED ENTITY, BLACKLIST, SOURCE VIEWER, COMMAND PALETTE (Ctrl+K)
+// ============================================================================
+window.openSeedModal = (editId = "") => {
+  const ent = editId ? (KB.entities || []).find(e => e.id === editId) : null;
+  $("seedModalTitle").textContent = ent ? `编辑实体：${ent.name}` : "录入种子实体";
+  $("modalEntId").value = ent ? ent.id : "";
+  $("modalEntName").value = ent ? ent.name : "";
+  $("modalEntCat").value = ent ? ent.category : "BusinessEntity";
+  $("modalEntType").value = ent ? (ent.entity_type || "") : "";
+  $("modalEntAliases").value = ent ? (ent.aliases || []).join(", ") : "";
+  $("modalEntDesc").value = ent ? (ent.description || "") : "";
+  $("seedModal").classList.remove("hidden");
+  setTimeout(() => $("modalEntName").focus(), 30);
+};
+
+$("btnModalSaveEntity").onclick = async () => {
+  const name = $("modalEntName").value.trim();
+  if (!name) return toast("请填写标准实体名称", true);
+  try {
+    const r = await api("/api/entity/save", {
+      id: $("modalEntId").value,
+      name,
+      category: $("modalEntCat").value,
+      entity_type: $("modalEntType").value,
+      aliases: $("modalEntAliases").value.split(/[,，]/).map(s => s.trim()).filter(Boolean),
+      description: $("modalEntDesc").value,
+    });
+    $("seedModal").classList.add("hidden");
+    await refreshKB();
+    if (currentView === "graph") openGraphDrawer(r.entity);
+    toast(`已保存实体「${name}」`);
+  } catch (e) {
+    toast(e.message, true);
+  }
+};
+
+window.openBlacklistModal = () => {
+  renderBlModalTags();
+  $("blacklistModal").classList.remove("hidden");
+};
+
+function renderBlModalTags() {
+  $("blModalTags").innerHTML = (KB.blacklist || []).map(w => `
+    <span class="alias-tag" style="display:inline-flex;align-items:center;gap:5px;padding:4px 9px;font-size:12px">
+      <span>${esc(w)}</span>
+      <button style="color:var(--danger);font-weight:700" onclick="removeBlWord('${esc(w)}')">×</button>
+    </span>
+  `).join("");
+}
+
+$("btnBlModalAdd").onclick = async () => {
+  const w = $("blModalInput").value.trim();
+  if (!w) return;
+  await api("/api/blacklist", { add: w });
+  $("blModalInput").value = "";
+  await refreshKB();
+  renderBlModalTags();
+};
+
+window.removeBlWord = async (w) => {
+  await api("/api/blacklist", { remove: w });
+  await refreshKB();
+  renderBlModalTags();
+};
+
+window.viewSourceModal = async (sid) => {
+  try {
+    const r = await api("/api/source?id=" + encodeURIComponent(sid));
+    $("sourceModalTitle").textContent = "录音转写原文溯源 · " + sid;
+    $("sourceModalBody").textContent = r.content;
+    $("sourceModal").classList.remove("hidden");
+  } catch (e) {
+    toast(e.message, true);
+  }
+};
+
+// Command Palette (Ctrl + K)
+function openSearchModal() {
+  $("searchModal").classList.remove("hidden");
+  $("cmdSearchInput").value = "";
+  renderCmdSearchResults("");
+  setTimeout(() => $("cmdSearchInput").focus(), 20);
+}
+window.closeSearchModal = () => $("searchModal").classList.add("hidden");
+
+$("btnOpenSearch").onclick = openSearchModal;
+window.addEventListener("keydown", e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+    e.preventDefault();
+    openSearchModal();
+  } else if (e.key === "Escape") {
+    closeSearchModal();
+  }
+});
+
+$("cmdSearchInput").oninput = e => renderCmdSearchResults(e.target.value.trim().toLowerCase());
+
+function renderCmdSearchResults(q) {
+  const items = [];
+  (KB.entities || []).forEach(e => {
+    const hay = `${e.name} ${(e.aliases || []).join(" ")} ${e.description || ""}`.toLowerCase();
+    if (!q || hay.includes(q)) {
+      items.push({
+        type: "实体",
+        badgeClass: e.category,
+        title: e.name + (e.aliases?.length ? ` (${e.aliases.join("/")})` : ""),
+        sub: e.description || "点击查看实体 Living Wiki 与图谱",
+        action: () => { closeSearchModal(); jumpToEntityWiki(e.name); },
+      });
+    }
+  });
+  if (q) {
+    (KB.facts || []).forEach(f => {
+      const hay = `${f.subject} ${f.predicate} ${f.object} ${f.evidence}`.toLowerCase();
+      if (hay.includes(q)) {
+        items.push({
+          type: "事实",
+          badgeClass: f.status,
+          title: `${f.subject} · ${f.predicate} ➔ ${f.object}`,
+          sub: f.evidence || f.date,
+          action: () => { closeSearchModal(); jumpToEntityWiki(f.subject); },
+        });
+      }
+    });
+  }
+
+  $("cmdSearchResults").innerHTML = items.slice(0, 20).map((it, i) => `
+    <div id="cmdItem_${i}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer" onmouseover="this.style.background='var(--bg-subtle)'" onmouseout="this.style.background='transparent'">
+      <span class="badge ${esc(it.badgeClass)}">${esc(it.type)}</span>
+      <div style="min-width:0;flex:1">
+        <div style="font-weight:600;font-size:13.5px;color:var(--ink)">${esc(it.title)}</div>
+        <div style="font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(it.sub)}</div>
+      </div>
+    </div>
+  `).join("") || `<div style="padding:24px;text-align:center;color:var(--muted)">未找到匹配内容</div>`;
+
+  items.slice(0, 20).forEach((it, i) => {
+    const el = $("cmdItem_" + i);
+    if (el) el.onclick = it.action;
+  });
+}
+
+// ============================================================================
+// VIEW 5: SETTINGS & PROFILE SAVE
+// ============================================================================
+$("btnSaveProfile").onclick = async () => {
+  try {
+    await api("/api/profile", {
+      my_name: $("profName").value,
+      my_role: $("profRole").value,
+      domain_context: $("profContext").value,
+      speaker_defaults: { "说话人 1": $("profName").value || "我", "说话人1": $("profName").value || "我" },
+    });
+    await refreshKB();
+    toast("个人冷启动锚点已保存");
+  } catch (e) {
+    toast(e.message, true);
+  }
+};
+
+$("btnSaveCfg").onclick = async () => {
+  try {
+    await api("/api/config", {
+      api_base_url: $("cfgBase").value,
+      model: $("cfgModel").value,
+      api_key: $("cfgKey").value,
+      knowledge_dir: $("cfgKb").value,
+    });
+    $("cfgKey").value = "";
+    $("cfgKey").placeholder = "已配置密钥（留空保持不变）";
+    toast("模型 API 设置已保存");
+  } catch (e) {
+    toast(e.message, true);
+  }
+};
+
+$("btnTestLlm").onclick = async () => {
+  try {
+    $("btnTestLlm").disabled = true;
+    toast("正在测试模型连通性…");
+    await api("/api/test_llm", {});
+    toast("模型接口连接正常！");
+  } catch (e) {
+    toast(e.message, true);
+  } finally {
+    $("btnTestLlm").disabled = false;
+  }
+};
+
+// Bootstrap
+(async () => {
+  try {
+    const c = await api("/api/config");
+    $("cfgBase").value = c.api_base_url;
+    $("cfgModel").value = c.model;
+    $("cfgKb").value = c.knowledge_dir;
+    $("cfgKey").placeholder = c.api_key_set ? "已配置密钥（留空保持不变）" : "请填写 API Key";
+    await refreshKB();
+  } catch (e) {
+    console.error(e);
+  }
+})();
+</script>
+</body>
+</html>
